@@ -13,7 +13,13 @@ import { AiOutlineFileDone } from "react-icons/ai";
 export default function Sidebar() {
   const location = useLocation();
 
-  // ONLY open submenu when current route is inside subjects
+  // detect if inside a specific subject
+  const subjectMatch = location.pathname.match(
+    /^\/subjects\/([^/]+)/
+  );
+
+  const subjectId = subjectMatch ? subjectMatch[1] : null;
+
   const isSubjectsActive = location.pathname.startsWith("/subjects");
 
   return (
@@ -27,7 +33,6 @@ export default function Sidebar() {
         </div>
       </div>
 
-      {/* Links */}
       <nav className="sidebar__nav">
         <NavLink className="sidebar__link" to="/" end>
           <span className="sidebar__icon">
@@ -43,22 +48,33 @@ export default function Sidebar() {
           Subject
         </NavLink>
 
-        {/* submenu appears only if subject is active */}
-        {isSubjectsActive && (
+        {isSubjectsActive && subjectId && (
           <div className="sidebar__subMenu">
-            <NavLink className="sidebar__subLink" to="/subjects/assignments">
+            <NavLink
+              className="sidebar__subLink"
+              to={`/subjects/${subjectId}/assignments`}
+            >
               <FaClipboardList /> <span>Assignment</span>
             </NavLink>
 
-            <NavLink className="sidebar__subLink" to="/subjects/quiz">
+            <NavLink
+              className="sidebar__subLink"
+              to={`/subjects/${subjectId}/quiz`}
+            >
               <AiOutlineFileDone /> <span>Quiz</span>
             </NavLink>
 
-            <NavLink className="sidebar__subLink" to="/subjects/recordings">
+            <NavLink
+              className="sidebar__subLink"
+              to={`/subjects/${subjectId}/recordings`}
+            >
               <BiVideo /> <span>Recordings</span>
             </NavLink>
 
-            <NavLink className="sidebar__subLink" to="/subjects/study-material">
+            <NavLink
+              className="sidebar__subLink"
+              to={`/subjects/${subjectId}/study-material`}
+            >
               <FaBookOpen /> <span>Study Material</span>
             </NavLink>
           </div>
@@ -74,6 +90,3 @@ export default function Sidebar() {
     </aside>
   );
 }
-
-
-
