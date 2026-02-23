@@ -69,7 +69,8 @@ export default function App() {
                 path="subjects/quiz/:subjectId/result/:quizId"
                 element={<QuizResult />}
               />
-
+              <Route path="subjects" element={<Subjects />} />
+              <Route path="subjects/:subjectId" element={<SubjectDetails />} />
               {/* ===== RECORDINGS ===== */}
               <Route path="subjects/recordings" element={<SubjectsRecordings />} />
               <Route
