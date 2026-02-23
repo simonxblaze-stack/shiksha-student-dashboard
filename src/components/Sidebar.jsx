@@ -14,7 +14,9 @@ export default function Sidebar() {
   const location = useLocation();
 
   // ONLY open submenu when current route is inside subjects
-  const isSubjectsActive = location.pathname.startsWith("/subjects");
+  const isSubjectsActive =
+  location.pathname.startsWith("/subjects") ||
+  location.pathname.startsWith("/assignments");
 
   return (
     <aside className="sidebar">
