@@ -5,7 +5,7 @@ import "../styles/quiz.css";
 
 export default function QuizDetail() {
   const navigate = useNavigate();
-  const { quizId } = useParams();
+  const { subjectId, quizId } = useParams(); // IMPORTANT
 
   const [quizData, setQuizData] = useState(null);
   const [answers, setAnswers] = useState({});
@@ -13,39 +13,17 @@ export default function QuizDetail() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
-  // ==========================================
-  // START QUIZ + FETCH QUIZ DATA
-  // ==========================================
+  // =========================
+  // FETCH QUIZ
+  // =========================
   useEffect(() => {
     async function fetchQuiz() {
       try {
         setLoading(true);
         setError(null);
 
-        // 🔹 Start attempt first
-        try {
-          await api.post(`/quizzes/${quizId}/start/`);
-        } catch (startErr) {
-          const message = startErr.response?.data?.detail;
-
-          if (message === "Quiz already submitted.") {
-            navigate(`/subjects/quiz/result/${quizId}`);
-            return;
-          }
-
-          if (message === "Quiz expired.") {
-            setError("Quiz expired.");
-            return;
-          }
-
-          // Any other error → throw
-          throw startErr;
-        }
-
-        // 🔹 Fetch quiz details
         const res = await api.get(`/quizzes/${quizId}/`);
         setQuizData(res.data);
-
       } catch (err) {
         setError(
           err.response?.data?.detail || "Unable to load quiz."
@@ -55,14 +33,12 @@ export default function QuizDetail() {
       }
     }
 
-    if (quizId) {
-      fetchQuiz();
-    }
-  }, [quizId, navigate]);
+    if (quizId) fetchQuiz();
+  }, [quizId]);
 
-  // ==========================================
-  // HANDLE ANSWER
-  // ==========================================
+  // =========================
+  // ANSWER CHANGE
+  // =========================
   const handleAnswerChange = (questionId, choiceId) => {
     setAnswers((prev) => ({
       ...prev,
@@ -70,9 +46,9 @@ export default function QuizDetail() {
     }));
   };
 
-  // ==========================================
-  // SUBMIT QUIZ
-  // ==========================================
+  // =========================
+  // SUBMIT
+  // =========================
   const handleSubmit = async () => {
     try {
       setSubmitting(true);
@@ -89,7 +65,7 @@ export default function QuizDetail() {
         answers: formattedAnswers,
       });
 
-      navigate(`/subjects/quiz/result/${quizId}`);
+      navigate(`/subjects/quiz/${subjectId}/result/${quizId}`);
     } catch (err) {
       setError(
         err.response?.data?.detail || "Failed to submit quiz."
@@ -99,22 +75,11 @@ export default function QuizDetail() {
     }
   };
 
-  // ==========================================
-  // STATES
-  // ==========================================
   if (loading)
-    return (
-      <div className="quizDetailPage">
-        <div className="quizDetailBox">Loading quiz...</div>
-      </div>
-    );
+    return <div className="quizDetailPage">Loading quiz...</div>;
 
   if (error)
-    return (
-      <div className="quizDetailPage">
-        <div className="quizDetailBox">{error}</div>
-      </div>
-    );
+    return <div className="quizDetailPage">{error}</div>;
 
   if (!quizData) return null;
 
@@ -123,14 +88,10 @@ export default function QuizDetail() {
       (q) => answers[q.id] !== undefined
     ) ?? false;
 
-  // ==========================================
-  // RENDER
-  // ==========================================
   return (
     <div className="quizDetailPage">
       <div className="quizDetailBox">
 
-        {/* Back Button */}
         <button
           className="quizDetailBack"
           onClick={() => navigate(-1)}
@@ -138,17 +99,14 @@ export default function QuizDetail() {
           &lt; Back
         </button>
 
-        {/* Header */}
         <div className="quizDetailHeader">
           <h2 className="quizDetailTitle">
             {quizData.subject_name}
           </h2>
         </div>
 
-        {/* Content */}
         <div className="quizDetailContent">
 
-          {/* Quiz Info */}
           <div className="quizDetailInfo">
             <h3 className="quizDetailInfoTitle">
               {quizData.title}
@@ -157,18 +115,13 @@ export default function QuizDetail() {
               {quizData.teacher_name}
             </p>
             <p className="quizDetailInfoDue">
-              Due:{" "}
-              {new Date(quizData.due_date).toLocaleString()}
+              Due: {new Date(quizData.due_date).toLocaleString()}
             </p>
           </div>
 
-          {/* Questions */}
           <div className="quizDetailQuestions">
             {quizData.questions.map((q, index) => (
-              <div
-                key={q.id}
-                className="quizDetailQuestion"
-              >
+              <div key={q.id} className="quizDetailQuestion">
                 <p className="quizDetailQuestionText">
                   {index + 1}. {q.text}
                 </p>
@@ -186,14 +139,9 @@ export default function QuizDetail() {
                       <input
                         type="radio"
                         name={`question-${q.id}`}
-                        checked={
-                          answers[q.id] === choice.id
-                        }
+                        checked={answers[q.id] === choice.id}
                         onChange={() =>
-                          handleAnswerChange(
-                            q.id,
-                            choice.id
-                          )
+                          handleAnswerChange(q.id, choice.id)
                         }
                       />
                       <span className="quizDetailOptionRadio"></span>
@@ -207,7 +155,6 @@ export default function QuizDetail() {
             ))}
           </div>
 
-          {/* Submit */}
           <div className="quizDetailSubmitWrap">
             <button
               className="quizDetailSubmit"
