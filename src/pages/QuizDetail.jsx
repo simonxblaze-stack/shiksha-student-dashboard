@@ -46,7 +46,7 @@ export default function QuizDetail() {
         })
       );
 
-      await api.post(`/quizzes/${quizId}/submit/`, { answers: formattedAnswers });
+      await api.post(`student/quizzes/${quizId}/submit/`, { answers: formattedAnswers });
       navigate(`/subjects/quiz/${subjectId}/result/${quizId}`);
     } catch (err) {
       setError(err.response?.data?.detail || "Failed to submit quiz.");
