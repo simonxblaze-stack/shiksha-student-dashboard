@@ -1,38 +1,25 @@
-/* MOBILE DASHBOARD */
 @media (max-width: 768px) {
-  .studentLayout__page {
-    padding: 10px 8px;
-  }
-
-  .header {
-    height: 56px;
-    padding: 0 12px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: relative;
-    background-color: #015865;
-    color: white;
-  }
-
   .topSliderTabs {
     position: sticky;
     top: 56px;
     z-index: 20;
-    background: #ffffff;
-    padding: 6px 0 10px;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    background: transparent;
   }
 
   .topSingleSlider {
     display: flex;
     width: 100%;
-    height: 40px;
+    height: 48px;
     padding: 0 10px;
     align-items: center;
     justify-content: space-between;
     background: #015865;
     border-radius: 0;
-    margin-bottom: 10px;
+    margin: 0 0 6px 0;
+    box-sizing: border-box;
   }
 
   .singleTitle {
@@ -52,20 +39,20 @@
     justify-content: center;
     background: transparent;
     border: none;
-    border-radius: 50%;
     color: #ffffff;
-    font-size: 20px;
+    font-size: 22px;
     cursor: pointer;
     transition: 0.2s;
+    padding: 0;
   }
 
   .singleArrow:disabled {
-    opacity: 0.35;
-    cursor: not-allowed;
+    opacity: 1;
+    cursor: pointer;
   }
 
-  .singleArrow:hover:not(:disabled) {
-    background: rgba(255,255,255,0.12);
+  .singleArrow:hover {
+    background: rgba(255, 255, 255, 0.12);
   }
 
   .desktopOnly {
@@ -74,6 +61,19 @@
 
   .mobileOnly {
     display: block !important;
+    width: 100%;
+  }
+
+  .mobileSectionBody {
+    width: 100%;
+    padding: 2px 0 0;
+    margin: 0;
+  }
+
+  .mobileSectionTopAction {
+    display: flex;
+    justify-content: flex-end;
+    margin: 0 0 6px 0;
   }
 
   .mobileSectionContent,
@@ -85,16 +85,7 @@
     flex-direction: column;
     gap: 10px;
     width: 100%;
-  }
-
-  .mobileSectionTopAction {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 8px;
-  }
-
-  .mobileSectionBody {
-    width: 100%;
+    margin: 0;
   }
 
   .sessionCard,
@@ -103,6 +94,10 @@
     width: 100%;
     margin-left: 0;
     margin-right: 0;
+  }
+
+  .mobileCalendarCard {
+    margin-top: 0;
   }
 }
 

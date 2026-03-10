@@ -16,36 +16,24 @@ export default function TopSliderTabs({ active, setActive }) {
   const currentTab = tabs[safeIndex];
 
   const goPrev = () => {
-    if (safeIndex > 0) {
-      setActive(tabs[safeIndex - 1].id);
-    }
+    const prevIndex = safeIndex === 0 ? tabs.length - 1 : safeIndex - 1;
+    setActive(tabs[prevIndex].id);
   };
 
   const goNext = () => {
-    if (safeIndex < tabs.length - 1) {
-      setActive(tabs[safeIndex + 1].id);
-    }
+    const nextIndex = safeIndex === tabs.length - 1 ? 0 : safeIndex + 1;
+    setActive(tabs[nextIndex].id);
   };
 
   return (
     <div className="topSingleSlider">
-      <button
-        className="singleArrow"
-        onClick={goPrev}
-        disabled={safeIndex === 0}
-      >
+      <button className="singleArrow" onClick={goPrev}>
         <HiChevronLeft />
       </button>
 
-      <div className="singleTitle">
-        {currentTab.label}
-      </div>
+      <div className="singleTitle">{currentTab.label}</div>
 
-      <button
-        className="singleArrow"
-        onClick={goNext}
-        disabled={safeIndex === tabs.length - 1}
-      >
+      <button className="singleArrow" onClick={goNext}>
         <HiChevronRight />
       </button>
     </div>
