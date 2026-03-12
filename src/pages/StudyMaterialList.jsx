@@ -2,26 +2,44 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import PageHeader from "../components/PageHeader";
 import "../styles/studyMaterial.css";
+ import api from "../api/apiClient";
 
 export default function StudyMaterialList() {
   const navigate = useNavigate();
   const [chaptersData, setChaptersData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
-  useEffect(() => {
-    const mockChaptersData = [
-      { id: 1, name: "Chapter 1", date: "21/01/26", fileUrl: "#" },
-      { id: 2, name: "Chapter 2", date: "22/01/26", fileUrl: "#" },
-      { id: 3, name: "Chapter 3", date: "23/01/26", fileUrl: "#" },
-      { id: 4, name: "Chapter 4", date: "26/01/26", fileUrl: "#" },
-      { id: 5, name: "Chapter 5", date: "26/01/26", fileUrl: "#" },
-    ];
-    setChaptersData(mockChaptersData);
-  }, []);
 
-  const handleView = (chapter) => {
-    window.open(chapter.fileUrl, "_blank");
-  };
+useEffect(() => {
+  api.get("/study-material/")
+    .then((res) => {
+
+      const materials = res.data.map((item) => {
+        const firstFile = item.files?.[0];
+
+        return {
+          id: item.id,
+          name: item.title,
+          date: new Date(item.created_at).toLocaleDateString(),
+          fileUrl: firstFile
+            ? `https://api.shikshacom.com${firstFile.file}`
+            : null
+        };
+      });
+
+      setChaptersData(materials);
+    })
+    .catch((err) => {
+      console.error("Failed to fetch study materials:", err);
+    });
+}, []);
+
+
+
+const handleView = (chapter) => {
+  if (!chapter.fileUrl) return;
+  window.open(chapter.fileUrl, "_blank");
+};
 
   const handleDownload = (chapter) => {
     const link = document.createElement("a");
