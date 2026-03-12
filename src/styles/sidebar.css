@@ -100,3 +100,30 @@
   opacity: 1;
   background: rgba(255, 255, 255, 0.20);
 }
+.sidebar__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.sidebar__closeBtn {
+  display: none;
+  border: none;
+  background: transparent;
+  color: #ffffff;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+}
+
+.sidebar__closeBtn:hover {
+  opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+  .sidebar__closeBtn {
+    display: block;
+  }
+}

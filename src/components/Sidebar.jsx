@@ -8,65 +8,104 @@ import { BsBook } from "react-icons/bs";
 import { BiVideo } from "react-icons/bi";
 import { FaClipboardList, FaBookOpen } from "react-icons/fa";
 import { RiLiveLine } from "react-icons/ri";
-import { AiOutlineFileDone } from "react-icons/ai";
+import { AiOutlineFileDone, AiOutlineClose } from "react-icons/ai";
 
-export default function Sidebar() {
+export default function Sidebar({ setMenuOpen }) {
   const location = useLocation();
 
-  // ONLY open submenu when current route is inside subjects
   const isSubjectsActive =
-  location.pathname.startsWith("/subjects") ||
-  location.pathname.startsWith("/assignments");
+    location.pathname.startsWith("/subjects") ||
+    location.pathname.startsWith("/assignments");
 
   return (
     <aside className="sidebar">
-      {/* Brand */}
-      <div className="sidebar__brand">
-        <img src={logo} alt="Logo" className="sidebar__logoCircle" />
-        <div>
-          <h2 className="sidebar__title">ShikshaCom</h2>
-          <p className="sidebar__tagline">Empowerment Through Education</p>
+      <div className="sidebar__top">
+        {/* Brand */}
+        <div className="sidebar__brand">
+          <img src={logo} alt="Logo" className="sidebar__logoCircle" />
+          <div>
+            <h2 className="sidebar__title">ShikshaCom</h2>
+            <p className="sidebar__tagline">Empowerment Through Education</p>
+          </div>
         </div>
+
+        {/* Close button */}
+        <button
+          className="sidebar__closeBtn"
+          onClick={() => setMenuOpen(false)}
+          type="button"
+          aria-label="Close sidebar"
+        >
+          <AiOutlineClose />
+        </button>
       </div>
 
       {/* Links */}
       <nav className="sidebar__nav">
-        <NavLink className="sidebar__link" to="/" end>
+        <NavLink
+          className="sidebar__link"
+          to="/"
+          end
+          onClick={() => setMenuOpen(false)}
+        >
           <span className="sidebar__icon">
             <MdDashboardCustomize />
           </span>
           Dashboard
         </NavLink>
 
-        <NavLink className="sidebar__link" to="/subjects">
+        <NavLink
+          className="sidebar__link"
+          to="/subjects"
+          onClick={() => setMenuOpen(false)}
+        >
           <span className="sidebar__icon">
             <BsBook />
           </span>
           Subject
         </NavLink>
 
-        {/* submenu appears only if subject is active */}
         {isSubjectsActive && (
           <div className="sidebar__subMenu">
-            <NavLink className="sidebar__subLink" to="/assignments">
+            <NavLink
+              className="sidebar__subLink"
+              to="/assignments"
+              onClick={() => setMenuOpen(false)}
+            >
               <FaClipboardList /> <span>Assignment</span>
             </NavLink>
 
-            <NavLink className="sidebar__subLink" to="/subjects/quiz">
+            <NavLink
+              className="sidebar__subLink"
+              to="/subjects/quiz"
+              onClick={() => setMenuOpen(false)}
+            >
               <AiOutlineFileDone /> <span>Quiz</span>
             </NavLink>
 
-            <NavLink className="sidebar__subLink" to="/subjects/recordings">
+            <NavLink
+              className="sidebar__subLink"
+              to="/subjects/recordings"
+              onClick={() => setMenuOpen(false)}
+            >
               <BiVideo /> <span>Recordings</span>
             </NavLink>
 
-            <NavLink className="sidebar__subLink" to="/subjects/study-material">
+            <NavLink
+              className="sidebar__subLink"
+              to="/subjects/study-material"
+              onClick={() => setMenuOpen(false)}
+            >
               <FaBookOpen /> <span>Study Material</span>
             </NavLink>
           </div>
         )}
 
-        <NavLink className="sidebar__link" to="/live-sessions">
+        <NavLink
+          className="sidebar__link"
+          to="/live-sessions"
+          onClick={() => setMenuOpen(false)}
+        >
           <span className="sidebar__icon">
             <RiLiveLine />
           </span>
@@ -76,6 +115,3 @@ export default function Sidebar() {
     </aside>
   );
 }
-
-
-

@@ -75,5 +75,6 @@
 
   .studentLayout__page {
     overflow-y: visible;
+    padding: 14px 16px 16px;
   }
 }
