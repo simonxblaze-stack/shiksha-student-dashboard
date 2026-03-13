@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import RecordingCard from "../components/RecordingCard";
 import PageHeader from "../components/PageHeader";
+import api from "../api/apiClient";
 import "../styles/recordings.css";
 
 export default function RecordingsList() {
@@ -12,18 +13,21 @@ export default function RecordingsList() {
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    const mockRecordingsData = [
-      { id: 1, subject: "Subject Name", sessionTitle: "Session Title/Topic", teacher: "Teacher Name", sessionDate: "Date & Time (Session date)" },
-      { id: 2, subject: "Subject Name", sessionTitle: "Session Title/Topic", teacher: "Teacher Name", sessionDate: "Date & Time (Session date)" },
-      { id: 3, subject: "Subject Name", sessionTitle: "Session Title/Topic", teacher: "Teacher Name", sessionDate: "Date & Time (Session date)" },
-      { id: 4, subject: "Subject Name", sessionTitle: "Session Title/Topic", teacher: "Teacher Name", sessionDate: "Date & Time (Session date)" },
-      { id: 5, subject: "Subject Name", sessionTitle: "Session Title/Topic", teacher: "Teacher Name", sessionDate: "Date & Time (Session date)" },
-      { id: 6, subject: "Subject Name", sessionTitle: "Session Title/Topic", teacher: "Teacher Name", sessionDate: "Date & Time (Session date)" },
-      { id: 7, subject: "Subject Name", sessionTitle: "Session Title/Topic", teacher: "Teacher Name", sessionDate: "Date & Time (Session date)" },
-      { id: 8, subject: "Subject Name", sessionTitle: "Session Title/Topic", teacher: "Teacher Name", sessionDate: "Date & Time (Session date)" },
-    ];
-    setRecordingsData(mockRecordingsData);
-  }, []);
+    const fetchRecordings = async () => {
+      try {
+        const res = await api.get(`/subjects/${subjectId}/recordings/`);
+        setRecordingsData(res.data || []);
+      } catch (err) {
+        console.error("Failed to load recordings", err);
+      }
+    };
+
+    fetchRecordings();
+  }, [subjectId]);
+
+  const filteredRecordings = recordingsData.filter((item) =>
+    item.title?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="recordingsPage">
@@ -32,23 +36,23 @@ export default function RecordingsList() {
       </button>
 
       <div className="recordingsHeaderBox">
-        <PageHeader title="Recordings" onSearch={setSearchTerm} />
+        <PageHeader title="Subject Recordings" onSearch={setSearchTerm} />
       </div>
 
       <div className="recordingsBodyBox">
         <div className="recordingsGrid">
-          {recordingsData
-            .filter((item) =>
-              item.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
-              item.sessionTitle.toLowerCase().includes(searchTerm.toLowerCase())
-            )
-            .map((item) => (
-              <RecordingCard
-                key={item.id}
-                {...item}
-                onClick={() => navigate(`/subjects/recordings/${subjectId}/video/${item.id}`)}
-              />
-            ))}
+          {filteredRecordings.map((item) => (
+            <RecordingCard
+              key={item.id}
+              subject="Session"
+              sessionTitle={item.title}
+              teacher="Teacher"
+              sessionDate={item.session_date}
+              onClick={() =>
+                navigate(`/subjects/recordings/${subjectId}/video/${item.id}`)
+              }
+            />
+          ))}
         </div>
       </div>
     </div>

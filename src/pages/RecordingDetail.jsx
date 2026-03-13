@@ -1,20 +1,31 @@
 import { useNavigate, useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
 import PageHeader from "../components/PageHeader";
+import api from "../api/apiClient";
 import "../styles/recordingDetail.css";
 
 export default function RecordingDetail() {
   const navigate = useNavigate();
   const { videoId } = useParams();
 
-  const videoData = {
-    subject: "Subject Name",
-    title: "Linear Equations",
-    teacher: "Sir Zodina",
-    dateRecorded: "22 Jan 2026",
-    dayTime: "Wednesday, 1:00 pm (IST)",
-    duration: "1:40:26",
-    videoUrl: "",
-  };
+  const [videoData, setVideoData] = useState(null);
+
+  useEffect(() => {
+    const fetchRecording = async () => {
+      try {
+        const res = await api.get(`/recordings/${videoId}/`);
+        setVideoData(res.data);
+      } catch (err) {
+        console.error("Failed to load recording", err);
+      }
+    };
+
+    fetchRecording();
+  }, [videoId]);
+
+  if (!videoData) return null;
+
+  const videoUrl = `https://iframe.mediadelivery.net/embed/YOUR_LIBRARY_ID/${videoData.bunny_video_id}`;
 
   return (
     <div className="recordingDetailPage">
@@ -23,20 +34,19 @@ export default function RecordingDetail() {
       </button>
 
       <div className="recordingDetailHeaderBox">
-        <PageHeader title={`${videoData.subject} - ${videoId}`} />
+        <PageHeader title={videoData.title} />
       </div>
 
       <div className="recordingDetailBodyBox">
         <div className="recordingDetailPlayer">
           <div className="recordingDetailVideo">
-            <video
-              controls
+            <iframe
+              src={videoUrl}
+              loading="lazy"
+              allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture"
+              allowFullScreen
               className="recordingDetailVideoElement"
-              poster="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800"
-            >
-              {videoData.videoUrl && <source src={videoData.videoUrl} type="video/mp4" />}
-              Your browser does not support the video tag.
-            </video>
+            />
           </div>
         </div>
 
@@ -45,20 +55,24 @@ export default function RecordingDetail() {
             <p className="recordingDetailInfoTitle">
               [Title] "{videoData.title}"
             </p>
+
             <p className="recordingDetailInfoTeacher">
               By:<br />
-              {videoData.teacher}
+              Teacher
             </p>
           </div>
+
           <div className="recordingDetailInfoRight">
             <p className="recordingDetailInfoDate">
               Date Recorded:<br />
-              {videoData.dateRecorded}<br />
-              {videoData.dayTime}
+              {videoData.session_date || "N/A"}
             </p>
+
             <p className="recordingDetailInfoDuration">
               Video Duration:<br />
-              {videoData.duration}
+              {videoData.duration_seconds
+                ? `${Math.floor(videoData.duration_seconds / 60)} min`
+                : "N/A"}
             </p>
           </div>
         </div>
