@@ -129,17 +129,25 @@ export default function QuizDetail() {
       <div className="quizActiveHeaderBox">
         <h2 className="quizPendingHeaderTitle">{quizData.subject_name}</h2>
 
-        <div className="quizSearch">
-          <input placeholder="Search..." />
-          <span className="quizSearchIcon">🔍</span>
-
-          {/* ✅ TIMER DISPLAY */}
+        {/* ✅ NEW WRAPPER */}
+        <div className="quizSearchWrapper">
+          
+          {/* ✅ TIMER LEFT */}
           {timeLeft !== null && (
-            <span className="quizTimer">
-              ⏱ {Math.floor(timeLeft / 60)}:
-              {String(timeLeft % 60).padStart(2, "0")}
-            </span>
+            <div className="quizTimer">
+              <span className="quizTimerIcon">⏱</span>
+              <span className="quizTimerText">
+                {Math.floor(timeLeft / 60)}:
+                {String(timeLeft % 60).padStart(2, "0")}
+              </span>
+            </div>
           )}
+
+          {/* EXISTING SEARCH */}
+          <div className="quizSearch">
+            <input placeholder="Search..." />
+            <span className="quizSearchIcon">🔍</span>
+          </div>
         </div>
       </div>
 
