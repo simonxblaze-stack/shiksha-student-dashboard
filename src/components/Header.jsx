@@ -150,6 +150,26 @@ export default function Header({ toggleMenu, menuOpen }) {
                 </span>
               </div>
               <div
+  className="header__profileItem"
+  onClick={() => {
+    setProfileOpen(false);
+    window.location.href = "https://shikshacom.com/";
+  }}
+>
+  <span>Return to Homepage</span>
+  <span className="header__profileArrow">
+    <svg width="8" height="12" viewBox="0 0 8 12" fill="none">
+      <path
+        d="M1.5 1L6.5 6L1.5 11"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  </span>
+</div>
+              <div
                 className="header__profileItem"
                 onClick={() => { setProfileOpen(false); navigate("/change-password"); }}
               >
