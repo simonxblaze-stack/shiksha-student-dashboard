@@ -14,8 +14,12 @@ export default function QuizDetail() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
+  
+
+  // ✅ TIMER STATE
   const [timeLeft, setTimeLeft] = useState(null);
 
+  // ✅ REF (fix auto submit issue)
   const answersRef = useRef({});
   const submittedRef = useRef(false);
 
@@ -36,6 +40,7 @@ export default function QuizDetail() {
     if (quizId) fetchQuiz();
   }, [quizId]);
 
+  // ✅ TIMER LOGIC (default = 5 min)
   useEffect(() => {
     if (!quizData) return;
 
@@ -74,11 +79,12 @@ export default function QuizDetail() {
   const handleAnswerChange = (questionId, choiceId) => {
     setAnswers((prev) => {
       const updated = { ...prev, [questionId]: choiceId };
-      answersRef.current = updated;
+      answersRef.current = updated; // ✅ keep latest answers
       return updated;
     });
   };
 
+  // ✅ AUTO SUBMIT (fixed)
   const handleAutoSubmit = async () => {
     try {
       const formattedAnswers = Object.entries(answersRef.current).map(
@@ -129,6 +135,8 @@ export default function QuizDetail() {
 
   const currentQuestion = quizData.questions[currentIndex];
 
+  const allAnswered = quizData.questions?.every((q) => answers[q.id] !== undefined) ?? false;
+
   return (
     <div className="quizActivePage">
       <button className="quizBackHeader" onClick={() => navigate(`/subjects/quiz/${subjectId}`)}>
@@ -139,6 +147,16 @@ export default function QuizDetail() {
         <h2 className="quizPendingHeaderTitle">{quizData.subject_name}</h2>
 
         <div className="quizSearchWrapper">
+          {timeLeft !== null && (
+            <div className="quizTimer">
+              <span className="quizTimerIcon">⏱</span>
+              <span className="quizTimerText">
+                {Math.floor(timeLeft / 60)}:
+                {String(timeLeft % 60).padStart(2, "0")}
+              </span>
+            </div>
+          )}
+
           <div className="quizSearch">
             <input placeholder="Search..." />
             <span className="quizSearchIcon">🔍</span>
@@ -146,114 +164,86 @@ export default function QuizDetail() {
         </div>
       </div>
 
-      {/* ✅ MAIN 2 COLUMN LAYOUT */}
-      <div className="quizActiveBodyBox" style={{ display: "flex", gap: "20px" }}>
-
-        {/* LEFT SIDE */}
-        <div style={{ flex: 3 }}>
-          <div className="quizDetailInfo">
-            <h3 className="quizDetailInfoTitle">{quizData.title}</h3>
-            <p className="quizDetailInfoMeta">{quizData.teacher_name}</p>
-            <p className="quizDetailInfoDue">
-              Due: {new Date(quizData.due_date).toLocaleString()}
-            </p>
-          </div>
+      <div className="quizActiveBodyBox">
+        <div className="quizDetailInfo">
+          <h3 className="quizDetailInfoTitle">{quizData.title}</h3>
+          <p className="quizDetailInfoMeta">{quizData.teacher_name}</p>
+          <p className="quizDetailInfoDue">Due: {new Date(quizData.due_date).toLocaleString()}</p>
+        </div>
 
           <div className="quizDetailQuestion">
-            <p className="quizDetailQuestionText">
-              {currentIndex + 1}. {currentQuestion.text}
-            </p>
+  <p className="quizDetailQuestionText">
+    {currentIndex + 1}. {currentQuestion.text}
+  </p>
 
-            {/* ✅ VERTICAL OPTIONS */}
-            <div className="quizDetailOptions">
-              {currentQuestion.choices.map((choice) => (
-                <label
-                  key={choice.id}
-                  className={`quizDetailOption ${
-                    answers[currentQuestion.id] === choice.id
-                      ? "quizDetailOption--selected"
-                      : ""
-                  }`}
-                  style={{ display: "block", marginBottom: "10px" }}
-                >
-                  <input
-                    type="radio"
-                    name={`question-${currentQuestion.id}`}
-                    checked={answers[currentQuestion.id] === choice.id}
-                    onChange={() =>
-                      handleAnswerChange(currentQuestion.id, choice.id)
-                    }
-                  />
-                  <span className="quizDetailOptionText">{choice.text}</span>
-                </label>
-              ))}
-            </div>
-          </div>
+  <div className="quizDetailOptions">
+    {currentQuestion.choices.map((choice) => (
+      <label
+        key={choice.id}
+        className={`quizDetailOption ${
+          answers[currentQuestion.id] === choice.id
+            ? "quizDetailOption--selected"
+            : ""
+        }`}
+      >
+        <input
+          type="radio"
+          name={`question-${currentQuestion.id}`}
+          checked={answers[currentQuestion.id] === choice.id}
+          onChange={() =>
+            handleAnswerChange(currentQuestion.id, choice.id)
+          }
+        />
+        <span className="quizDetailOptionRadio" />
+        <span className="quizDetailOptionText">{choice.text}</span>
+      </label>
+    ))}
+  </div>
+</div>
 
-          {/* NAVIGATION */}
-          <div style={{ marginTop: "20px", display: "flex", gap: "10px" }}>
-            {currentIndex > 0 && (
-              <button onClick={() => setCurrentIndex(currentIndex - 1)}>
-                Back
-              </button>
-            )}
+<div style={{ marginTop: "20px" }}>
+  {quizData.questions.map((q, index) => (
+    <button
+      key={q.id}
+      onClick={() => setCurrentIndex(index)}
+      style={{
+        margin: "5px",
+        padding: "6px 10px",
+        background:
+          answers[q.id]
+            ? "green"
+            : index === currentIndex
+            ? "blue"
+            : "gray",
+        color: "white",
+        border: "none",
+        borderRadius: "4px",
+      }}
+    >
+      {index + 1}
+    </button>
+  ))}
+</div>
 
-            {currentIndex < quizData.questions.length - 1 ? (
-              <button onClick={() => setCurrentIndex(currentIndex + 1)}>
-                Save & Next
-              </button>
-            ) : (
-              <button onClick={handleSubmit} disabled={submitting}>
-                {submitting ? "Submitting..." : "Submit"}
-              </button>
-            )}
-          </div>
-        </div>
+        <div style={{ marginTop: "20px", display: "flex", gap: "10px" }}>
+  
+  {currentIndex > 0 && (
+    <button onClick={() => setCurrentIndex(currentIndex - 1)}>
+      Back
+    </button>
+  )}
 
-        {/* RIGHT SIDE (PALETTE + TIMER) */}
-        <div
-          style={{
-            flex: 1,
-            borderLeft: "2px solid #ddd",
-            paddingLeft: "15px",
-          }}
-        >
-          {/* ✅ TIMER MOVED HERE */}
-          {timeLeft !== null && (
-            <div style={{ marginBottom: "20px", fontWeight: "bold", color: "red" }}>
-              ⏱ {Math.floor(timeLeft / 60)}:
-              {String(timeLeft % 60).padStart(2, "0")}
-            </div>
-          )}
+  {currentIndex < quizData.questions.length - 1 ? (
+    <button onClick={() => setCurrentIndex(currentIndex + 1)}>
+      Save & Next
+    </button>
+  ) : (
+    <button onClick={handleSubmit} disabled={submitting}>
+      {submitting ? "Submitting..." : "Submit"}
+    </button>
+  )}
 
-          <h4>Questions</h4>
-
-          <div>
-            {quizData.questions.map((q, index) => (
-              <button
-                key={q.id}
-                onClick={() => setCurrentIndex(index)}
-                style={{
-                  margin: "5px",
-                  padding: "8px",
-                  width: "40px",
-                  background:
-                    answers[q.id]
-                      ? "green"
-                      : index === currentIndex
-                      ? "blue"
-                      : "gray",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "5px",
-                }}
-              >
-                {index + 1}
-              </button>
-            ))}
-          </div>
-        </div>
-
+</div>
       </div>
     </div>
   );
