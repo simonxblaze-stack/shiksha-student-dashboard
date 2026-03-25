@@ -41,7 +41,7 @@ export default function QuizDetail() {
   useEffect(() => {
     if (!quizData) return;
 
-    const duration = (quizData.duration || 5) * 60;
+    const duration = (quizData.time_limit_minutes || 5) * 60;
 
     let startTime = localStorage.getItem(`quiz_${quizId}_start`);
 
