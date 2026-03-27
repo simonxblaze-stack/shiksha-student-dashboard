@@ -14,7 +14,7 @@ export default function LiveSessionDetail() {
     const joinSession = async () => {
       try {
         const res = await api.post(
-          `/livestream/sessions/${id}/join/`
+          `https://api.shikshacom.com/api/livestream/sessions/${id}/join/`
         );
         setData(res.data);
       } catch (err) {
@@ -29,16 +29,18 @@ export default function LiveSessionDetail() {
 
   if (!data) return <div style={{ padding: 20 }}>Joining session...</div>;
 
+  const isTeacher = data.role === "TEACHER";
+
   return (
     <LiveKitRoom
       serverUrl={data.livekit_url}
       token={data.token}
       connect={true}
-      video={data.role === "teacher"}
+      video={isTeacher}
       audio={true}
     >
       <ClassroomUI role={data.role} />
-      {data.role === "teacher" && <TeacherControls />}
+      {isTeacher && <TeacherControls />}
       <RoomAudioRenderer />
     </LiveKitRoom>
   );

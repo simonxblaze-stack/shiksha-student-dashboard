@@ -24,7 +24,7 @@ export default function LiveSessions() {
       setLoading(true);
       try {
         const res = await api.get(
-          `/livestream/student/sessions/?course_id=${activeCourse.id}`
+          `https://api.shikshacom.com/api/livestream/student/sessions/?course_id=${activeCourse.id}`
         );
 
         const sorted = res.data.sort(
