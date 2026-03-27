@@ -2,6 +2,8 @@ import { useTracks, VideoTrack } from "@livekit/components-react";
 import { Track } from "livekit-client";
 import ParticipantsPanel from "./ParticipantsPanel";
 import ChatPanel from "./ChatPanel";
+import RaiseHandButton from "./RaiseHandButton";
+import ControlBar from "./ControlBar";
 import { useState } from "react";
 
 export default function ClassroomUI({ role }) {
@@ -12,7 +14,7 @@ export default function ClassroomUI({ role }) {
     { source: Track.Source.ScreenShare, withPlaceholder: false },
   ]);
 
-  // 🔐 PRODUCTION SAFE: Detect teacher by publish permission
+  // 🔥 BEST WAY: detect teacher (publisher)
   const teacherTrack = tracks.find(
     (t) => t.participant.permissions?.canPublish
   );
@@ -20,30 +22,38 @@ export default function ClassroomUI({ role }) {
   if (!teacherTrack) {
     return (
       <div className="waiting-screen">
-        <h2>Waiting for teacher to start video or share screen…</h2>
+        <h2>Waiting for teacher to start…</h2>
       </div>
     );
   }
 
   return (
     <div className="classroom-layout">
+      {/* MAIN VIDEO */}
       <div className={`main-stage ${sidebarOpen ? "" : "full-width"}`}>
         <button
           className="toggle-sidebar-btn"
           onClick={() => setSidebarOpen(!sidebarOpen)}
         >
-          {sidebarOpen ? "Hide Chat" : "Show Chat"}
+          {sidebarOpen ? "Hide Panel" : "Show Panel"}
         </button>
 
         <VideoTrack trackRef={teacherTrack} />
       </div>
 
+      {/* SIDEBAR */}
       {sidebarOpen && (
         <div className="right-sidebar">
           <ParticipantsPanel />
           <ChatPanel role={role} />
         </div>
       )}
+
+      {/* CONTROLS */}
+      <ControlBar />
+
+      {/* STUDENT ONLY */}
+      {role === "STUDENT" && <RaiseHandButton />}
     </div>
   );
 }

@@ -4,29 +4,36 @@ import { useEffect, useState } from "react";
 export default function ParticipantsPanel() {
   const participants = useParticipants();
   const room = useRoomContext();
+
   const [open, setOpen] = useState(true);
   const [raisedHands, setRaisedHands] = useState({});
 
   useEffect(() => {
+    const decoder = new TextDecoder();
+
     const handleData = (payload, participant) => {
       try {
-        const text = new TextDecoder().decode(payload);
-        const msg = JSON.parse(text);
+        const msg = JSON.parse(decoder.decode(payload));
 
-        if (msg.type === "raise-hand") {
-  const id = participant?.identity || msg.sender;
-  if (!id) return;
+        const id = participant?.identity || msg.sender;
+        if (!id) return;
 
-  setRaisedHands((prev) => ({ ...prev, [id]: true }));
+        // ✋ RAISE HAND
+        if (msg.type === "RAISE_HAND") {
+          setRaisedHands((prev) => ({
+            ...prev,
+            [id]: true,
+          }));
+        }
 
-  setTimeout(() => {
-    setRaisedHands((prev) => {
-      const updated = { ...prev };
-      delete updated[id];
-      return updated;
-    });
-  }, 15000);
-}
+        // 👇 LOWER HAND
+        if (msg.type === "LOWER_HAND") {
+          setRaisedHands((prev) => {
+            const updated = { ...prev };
+            delete updated[id];
+            return updated;
+          });
+        }
       } catch {}
     };
 
@@ -36,21 +43,32 @@ export default function ParticipantsPanel() {
 
   return (
     <div className="participants-wrapper">
-      <div className="participants-header" onClick={() => setOpen(!open)}>
-        <span>Participants</span>
+      <div
+        className="participants-header"
+        onClick={() => setOpen(!open)}
+      >
+        <span>Participants ({participants.length})</span>
         <span>{open ? "▾" : "▸"}</span>
       </div>
 
       {open && (
         <div className="participants-row">
           {participants.map((p) => (
-            <div key={p.identity} className="participant-card">
+            <div
+              key={p.identity}
+              className={`participant-card ${
+                raisedHands[p.identity] ? "hand-raised" : ""
+              }`}
+            >
               <div className="participant-avatar">
                 {p.identity.charAt(0).toUpperCase()}
               </div>
+
               <div className="participant-name">
                 {p.identity}
-                {raisedHands[p.identity] && " ✋"}
+                {raisedHands[p.identity] && (
+                  <span className="raised-hand-icon"> ✋</span>
+                )}
               </div>
             </div>
           ))}
