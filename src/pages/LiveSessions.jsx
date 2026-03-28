@@ -52,12 +52,25 @@ export default function LiveSessions() {
     return () => controller.abort();
   }, [activeCourse]);
 
+  // ✅ Centralized IST formatter
+  const formatIST = (dateString) => {
+    return new Date(dateString).toLocaleString("en-IN", {
+      timeZone: "Asia/Kolkata",
+    });
+  };
+
+  const formatTimeIST = (dateString) => {
+    return new Date(dateString).toLocaleTimeString("en-IN", {
+      timeZone: "Asia/Kolkata",
+    });
+  };
+
   const formatStatus = (session) => {
     const status = session.computed_status;
 
     if (status === "LIVE") return "🔴 Live Now";
     if (status === "SCHEDULED")
-      return `Starts at ${new Date(session.start_time).toLocaleTimeString()}`;
+      return `Starts at ${formatTimeIST(session.start_time)}`;
     if (status === "COMPLETED") return "Completed";
     return status;
   };
@@ -107,7 +120,7 @@ export default function LiveSessions() {
                   <p className="liveCardText">{s.title}</p>
                   <p className="liveCardText">{s.teacher}</p>
                   <p className="liveCardText">
-                    {new Date(s.start_time).toLocaleString()}
+                    {formatIST(s.start_time)}
                   </p>
                   <p className="liveCardText">{formatStatus(s)}</p>
                 </div>
