@@ -88,6 +88,8 @@ export default function LiveSessions() {
   if (loading) return <div style={{ padding: 20 }}>Loading sessions...</div>;
   if (error) return <div style={{ padding: 20, color: "red" }}>{error}</div>;
 
+  console.log("SESSION SAMPLE:", sessions[0]);
+
   return (
     <div className="liveSessionsPage">
       <div className="liveSessionsHeaderBox">
