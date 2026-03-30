@@ -96,7 +96,11 @@ export default function QuizDetail() {
 
   // ── timer ─────────────────────────────────────────────────────────────────
   useEffect(() => {
-    if (durationRef.current === null || startTimeRef.current === null) return;
+    if (timeLeft === null) return;
+    if (timeLeft <= 0) {
+      if (!submittedRef.current) { submittedRef.current = true; handleAutoSubmit(); }
+      return;
+    }
     const interval = setInterval(() => {
       const elapsed   = Math.floor((Date.now() - startTimeRef.current) / 1000);
       const remaining = durationRef.current - elapsed;
