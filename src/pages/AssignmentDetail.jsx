@@ -82,19 +82,17 @@ export default function AssignmentDetail() {
     }
   };
 
-  // ✅ FIX: open student submitted file
   const handleOpenFile = () => {
-  const fileUrl =
-    assignment?.submitted_file ||
-    assignment?.file ||
-    assignment?.submission_file;
+    const fileUrl =
+      assignment?.submitted_file ||
+      assignment?.file ||
+      assignment?.submission_file;
 
-  if (fileUrl) {
-    window.open(fileUrl, "_blank");
-  }
-};
+    if (fileUrl) {
+      window.open(fileUrl, "_blank");
+    }
+  };
 
-  // ✅ FIX: open teacher attachment
   const handleOpenAttachment = () => {
     if (assignment?.attachment) {
       window.open(assignment.attachment, "_blank");
@@ -172,7 +170,6 @@ export default function AssignmentDetail() {
               Description: {assignment.description}
             </p>
 
-            {/* ✅ FIX: clickable teacher file */}
             {assignment.attachment && (
               <div className="fileStrip" onClick={handleOpenAttachment}>
                 <div className="fileStripIcon">
@@ -194,45 +191,46 @@ export default function AssignmentDetail() {
           </div>
 
           {/* RIGHT SIDE */}
-          <div className="assignmentDetailRight">
-            <div className="yourWorkTop">
-              <h4 className="assignmentDetailWorkTitle">Your Work</h4>
+          {!isSubmitted ? (
+            <div className="assignmentDetailRight">
+              <div className="yourWorkTop">
+                <h4 className="assignmentDetailWorkTitle">Your Work</h4>
+              </div>
 
-              {isSubmitted && (
-                <span className="yourWorkDate">
-                  {formatSmallDate(submittedAt)}
-                </span>
-              )}
+              <label className="assignmentDetailUploadBtn">
+                <input type="file" hidden onChange={handleFileUpload} />
+                {uploadedFile ? uploadedFile.name : "[Upload File]"}
+              </label>
+
+              <button
+                className="assignmentDetailSubmitBtn"
+                onClick={handleSubmit}
+                disabled={!uploadedFile}
+              >
+                Submit
+              </button>
             </div>
+          ) : (
+            <>
+              {/* BREAK FLEX LAYOUT */}
+              <div style={{ width: "100%" }} />
 
-            {!isSubmitted ? (
-              <>
-                {/* ✅ FIX: show selected file name */}
-                <label className="assignmentDetailUploadBtn">
-                  <input type="file" hidden onChange={handleFileUpload} />
-                  {uploadedFile ? uploadedFile.name : "[Upload File]"}
-                </label>
+              <div style={{ width: "100%", marginTop: "20px" }}>
+                <h4 style={{ marginBottom: "6px" }}>Your Submission</h4>
 
-                <button
-                  className="assignmentDetailSubmitBtn"
-                  onClick={handleSubmit}
-                  disabled={!uploadedFile}
+                <p
+                  className="submittedTopText"
+                  style={{ marginBottom: "10px" }}
                 >
-                  Submit
-                </button>
-              </>
-            ) : (
-              <>
-                <button className="openFileBtn" onClick={handleOpenFile}>
-                  [Open File]
-                </button>
+                  {formatSubmittedTop(submittedAt)}
+                </p>
 
-                <button className="submittedBtn" disabled>
-                  Submitted
+                <button className="openFileBtn" onClick={handleOpenFile}>
+                  Open Submitted File
                 </button>
-              </>
-            )}
-          </div>
+              </div>
+            </>
+          )}
 
         </div>
       </div>
