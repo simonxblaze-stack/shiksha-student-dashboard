@@ -438,43 +438,7 @@ export default function Dashboard() {
                   </div>
                 )}
               </div>
-
-              <div className="whiteCard">
-                <div
-                  className="cardHeader cardHeader--clickable"
-                  onClick={() => setShowQuizzes(!showQuizzes)}
-                >
-                  <h3>Quiz</h3>
-
-                  <button className="arrowBtn">
-                    <span
-                      className={`arrowBtn__chevron ${
-                        showQuizzes ? "arrowBtn__chevron--up" : ""
-                      }`}
-                    >
-                      <svg width="12" height="8" viewBox="0 0 12 8" fill="none">
-                        <path
-                          d="M1 1.5L6 6.5L11 1.5"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </span>
-                  </button>
-                </div>
-
-                {showQuizzes && (
-                  <div className="listBody">
-                    {quizzes.map((q, idx) => (
-                      <AssignmentCard key={idx} {...q} />
-                    ))}
-                  </div>
-                )}
-              </div>
             </div>
-
             {/* Notifications */}
             <div className="whiteCard">
               <div className="cardHeader">
@@ -522,10 +486,11 @@ export default function Dashboard() {
                         )}
                       </div>
                       <p className="scheduleTitle">{item.title}</p>
-
+                  <div>
                     <p className="scheduleSub">{item.subject}</p>
                     <p className="scheduleSub">{item.teacher}</p>
                     <p className="scheduleSub">{item.time}</p>
+                  </div>
                   </div>
                 ))}
               </div>
