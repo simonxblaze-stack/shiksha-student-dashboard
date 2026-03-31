@@ -24,7 +24,6 @@ export default function SubjectsAssignments() {
         setLoading(true);
         setError(null);
 
-        // FIX: removed /api prefix
         const res = await api.get(`/assignments/subject/${subjectId}/`);
 
         const pending = [];
@@ -120,7 +119,9 @@ export default function SubjectsAssignments() {
                 <AssignmentCompletedCard
                   key={item.id}
                   id={item.id}
+                  subjectId={subjectId}   // ✅ ONLY FIX ADDED
                   title={item.title}
+                  teacher={item.teacher_name} // (safe optional)
                   completedDate="Submitted"
                 />
               ))}
