@@ -17,28 +17,29 @@ export default function AssignmentPendingCard({
 
   return (
     <div className="assignmentPendingCard" onClick={handleClick}>
+      
       <div className="assignmentPendingCard__top">
+        {/* ✅ LABEL ADDED */}
+        <p className="assignmentPendingCard__label">Title:</p>
         <p className="assignmentPendingCard__title">{title}</p>
       </div>
 
-      {/* ✅ NEW */}
+      {/* ✅ LABEL ADDED */}
       {chapter && (
         <p className="assignmentPendingCard__chapter">
-          {chapter}
+          <span className="assignmentPendingCard__label">Subject:</span> {chapter}
         </p>
       )}
 
-      {/* ✅ UPDATED */}
       {teacher && (
         <p className="assignmentPendingCard__teacher">
-          {teacher}
+          <span className="assignmentPendingCard__label">Teacher:</span> {teacher}
         </p>
       )}
 
       <div className="assignmentPendingCard__bottom">
-        {/* ✅ FIXED */}
         <p className="assignmentPendingCard__deadline">
-          Due: {deadline}
+          <span className="assignmentPendingCard__label">Due:</span> {deadline}
         </p>
       </div>
     </div>
