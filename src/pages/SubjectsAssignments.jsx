@@ -106,7 +106,9 @@ export default function SubjectsAssignments() {
                   id={item.id}
                   subjectId={subjectId}
                   title={item.title}
-                  deadline={new Date(item.due_date).toLocaleString()}
+                  teacher={item.teacher || ""}
+                  chapter={item.chapter || ""}
+                  deadline={new Date(item.due_date).toLocaleDateString("en-GB")}
                 />
               ))}
 

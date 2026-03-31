@@ -3,9 +3,10 @@ import "../styles/assignmentPending.css";
 
 export default function AssignmentPendingCard({ 
   id, 
-  subjectId,   // ✅ ADD THIS
+  subjectId,
   title, 
   teacher, 
+  chapter,
   deadline 
 }) {
   const navigate = useNavigate();
@@ -19,9 +20,26 @@ export default function AssignmentPendingCard({
       <div className="assignmentPendingCard__top">
         <p className="assignmentPendingCard__title">{title}</p>
       </div>
-      <p className="assignmentPendingCard__teacher">{teacher}</p>
+
+      {/* ✅ NEW */}
+      {chapter && (
+        <p className="assignmentPendingCard__chapter">
+          {chapter}
+        </p>
+      )}
+
+      {/* ✅ UPDATED */}
+      {teacher && (
+        <p className="assignmentPendingCard__teacher">
+          {teacher}
+        </p>
+      )}
+
       <div className="assignmentPendingCard__bottom">
-        <p className="assignmentPendingCard__deadline">{deadline}</p>
+        {/* ✅ FIXED */}
+        <p className="assignmentPendingCard__deadline">
+          Due: {deadline}
+        </p>
       </div>
     </div>
   );
