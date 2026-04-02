@@ -124,9 +124,9 @@
   overflow-x: auto;
 }
 
-/* ── Table ── */
 .studyMaterialTable {
   width: 100%;
+  min-width: 520px;
   border-collapse: separate;
   border-spacing: 0 10px;
 }
@@ -176,14 +176,18 @@
 }
 
 .studyMaterialTable th:first-child,
-.studyMaterialTable td:first-child { width: 40%; }
+.studyMaterialTable td:first-child { width: auto; }
 
 .studyMaterialTable th:nth-child(2),
-.studyMaterialTable td:nth-child(2) { width: 25%; }
+.studyMaterialTable td:nth-child(2) {
+  width: 140px;
+  white-space: nowrap;
+}
 
 .studyMaterialTable th:last-child,
 .studyMaterialTable td:last-child {
-  width: 35%;
+  width: 240px;
+  min-width: 240px;
   text-align: right;
 }
 
@@ -192,6 +196,7 @@
   display: flex;
   gap: 8px;
   justify-content: flex-end;
+  flex-wrap: nowrap;
 }
 
 .studyMaterialViewBtn {
@@ -202,11 +207,13 @@
   background: #1d9e75;
   color: white;
   border: none;
-  padding: 7px 16px;
+  padding: 7px 20px;
   border-radius: 8px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
+  white-space: nowrap;
+  min-width: 70px;
   transition: background 0.2s, transform 0.15s, box-shadow 0.15s;
   position: relative;
   overflow: hidden;
@@ -241,11 +248,13 @@
   background: #488fb3;
   color: white;
   border: none;
-  padding: 7px 16px;
+  padding: 7px 20px;
   border-radius: 8px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
+  white-space: nowrap;
+  min-width: 100px;
   transition: background 0.2s, transform 0.15s, box-shadow 0.15s;
   position: relative;
   overflow: hidden;
