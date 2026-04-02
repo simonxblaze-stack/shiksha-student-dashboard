@@ -1,4 +1,4 @@
-/* Study Material List Page */
+/* ── Page Layout ── */
 .studyMaterialPage {
   flex: 1;
   min-height: 0;
@@ -31,7 +31,7 @@
   padding: 20px 24px;
 }
 
-/* Back Button */
+/* ── Back Button ── */
 .studyMaterialBack {
   background: #0a808a;
   color: white;
@@ -42,13 +42,17 @@
   font-weight: 600;
   cursor: pointer;
   align-self: flex-start;
+  transition: background 0.2s, transform 0.15s;
 }
-
 .studyMaterialBack:hover {
   background: #097a83;
+  transform: translateX(-2px);
+}
+.studyMaterialBack:active {
+  transform: translateX(0) scale(0.97);
 }
 
-/* Header with Title and Search */
+/* ── Header ── */
 .studyMaterialHeader {
   display: flex;
   justify-content: space-between;
@@ -56,7 +60,6 @@
   margin-bottom: 20px;
 }
 
-/* Subject Title */
 .studyMaterialTitle {
   font-size: 16px;
   font-weight: 700;
@@ -64,7 +67,7 @@
   margin: 0;
 }
 
-/* Search */
+/* ── Search ── */
 .studyMaterialSearch {
   display: flex;
   align-items: center;
@@ -73,6 +76,12 @@
   padding: 8px 12px;
   border-radius: 8px;
   width: 200px;
+  border: 1px solid transparent;
+  transition: border-color 0.2s, background 0.2s;
+}
+.studyMaterialSearch:focus-within {
+  background: #fff;
+  border-color: #0a808a;
 }
 
 .studyMaterialSearch input {
@@ -88,24 +97,38 @@
   opacity: 0.6;
 }
 
-/* Content Area with teal background */
+/* ── Content Area ── */
 .studyMaterialContent {
   background: #e8f4f4;
   border-radius: 12px;
   padding: 24px;
+  animation: sm-fadeIn 0.3s ease both;
 }
 
-/* Table Wrapper */
+@keyframes sm-fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Empty State ── */
+.studyMaterialEmpty {
+  text-align: center;
+  padding: 40px 20px;
+  color: #4a8c72;
+  font-size: 14px;
+}
+
+/* ── Table Wrapper ── */
 .studyMaterialTableWrap {
   width: 100%;
   overflow-x: auto;
 }
 
-/* Chapters Table */
+/* ── Table ── */
 .studyMaterialTable {
   width: 100%;
   border-collapse: separate;
-  border-spacing: 0 12px;
+  border-spacing: 0 10px;
 }
 
 .studyMaterialTable thead tr {
@@ -113,42 +136,50 @@
 }
 
 .studyMaterialTable th {
-  padding: 12px 16px;
+  padding: 10px 16px;
   text-align: left;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
-  color: #333;
+  color: #4a8c72;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
+/* ── Table Rows ── */
 .studyMaterialTable tbody tr {
   background: white;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  border-radius: 8px;
+  border-radius: 10px;
+  transition: transform 0.15s, box-shadow 0.15s;
+  cursor: default;
+}
+.studyMaterialTable tbody tr:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(10, 128, 138, 0.1);
+}
+.studyMaterialTable tbody tr:active {
+  transform: translateY(0);
 }
 
 .studyMaterialTable td {
-  padding: 16px;
+  padding: 14px 16px;
   font-size: 13px;
-  color: #555;
+  color: #2d6b52;
 }
 
 .studyMaterialTable td:first-child {
-  border-radius: 8px 0 0 8px;
+  border-radius: 10px 0 0 10px;
+  font-weight: 500;
+  color: #0a3d2b;
 }
-
 .studyMaterialTable td:last-child {
-  border-radius: 0 8px 8px 0;
+  border-radius: 0 10px 10px 0;
 }
 
 .studyMaterialTable th:first-child,
-.studyMaterialTable td:first-child {
-  width: 40%;
-}
+.studyMaterialTable td:first-child { width: 40%; }
 
 .studyMaterialTable th:nth-child(2),
-.studyMaterialTable td:nth-child(2) {
-  width: 25%;
-}
+.studyMaterialTable td:nth-child(2) { width: 25%; }
 
 .studyMaterialTable th:last-child,
 .studyMaterialTable td:last-child {
@@ -156,61 +187,90 @@
   text-align: right;
 }
 
-/* Action Buttons */
+/* ── Action Buttons ── */
 .studyMaterialActions {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   justify-content: flex-end;
 }
 
 .studyMaterialViewBtn {
-  display: flex;
-  justify-content: center;
+  display: inline-flex;
   align-items: center;
-  gap: 4px;
-  background: #47B27D;
+  justify-content: center;
+  gap: 5px;
+  background: #1d9e75;
   color: white;
   border: none;
-  padding: 8px 16px;
+  padding: 7px 16px;
   border-radius: 8px;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.15s;
+  position: relative;
+  overflow: hidden;
 }
-
+.studyMaterialViewBtn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: white;
+  opacity: 0;
+  transition: opacity 0.15s;
+  border-radius: inherit;
+}
 .studyMaterialViewBtn:hover {
-  background: #3da06e;
+  background: #0f6e56;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(29, 158, 117, 0.35);
+}
+.studyMaterialViewBtn:active {
+  transform: scale(0.96);
+  box-shadow: none;
+}
+.studyMaterialViewBtn:active::after {
+  opacity: 0.08;
 }
 
 .studyMaterialDownloadBtn {
-  display: flex;
-  justify-content: center;
+  display: inline-flex;
   align-items: center;
-  gap: 4px;
-  background: #488FB3;
+  justify-content: center;
+  gap: 5px;
+  background: #488fb3;
   color: white;
   border: none;
-  padding: 8px 16px;
+  padding: 7px 16px;
   border-radius: 8px;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.15s;
+  position: relative;
+  overflow: hidden;
 }
-
 .studyMaterialDownloadBtn:hover {
   background: #3d7a9a;
-
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(72, 143, 179, 0.35);
 }
-/* ============================= */
-/* Responsive - Tablet */
-/* ============================= */
+.studyMaterialDownloadBtn:active {
+  transform: scale(0.96);
+  box-shadow: none;
+}
+
+/* ── Downloading state (add via JS: btn.classList.add('downloading')) ── */
+.studyMaterialDownloadBtn.downloading {
+  background: #3d7a9a;
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+/* ── Responsive — Tablet ── */
 @media (max-width: 1024px) {
   .studyMaterialHeaderBox,
-  .studyMaterialBodyBox {
-    padding: 18px;
-  }
+  .studyMaterialBodyBox { padding: 18px; }
 
   .studyMaterialHeader {
     flex-direction: column;
@@ -218,9 +278,7 @@
     gap: 12px;
   }
 
-  .studyMaterialSearch {
-    width: 100%;
-  }
+  .studyMaterialSearch { width: 100%; }
 
   .studyMaterialTable th,
   .studyMaterialTable td {
@@ -228,7 +286,6 @@
     padding: 12px;
   }
 
-  /* Prevent Date + buttons from overlapping at 770–1046px */
   .studyMaterialActions {
     flex-direction: column;
     align-items: flex-end;
@@ -244,27 +301,17 @@
   }
 
   .studyMaterialTable th:first-child,
-  .studyMaterialTable td:first-child {
-    width: 35%;
-  }
+  .studyMaterialTable td:first-child { width: 35%; }
 
   .studyMaterialTable th:nth-child(2),
-  .studyMaterialTable td:nth-child(2) {
-    width: 20%;
-  }
+  .studyMaterialTable td:nth-child(2) { width: 20%; }
 
   .studyMaterialTable th:last-child,
-  .studyMaterialTable td:last-child {
-    width: 45%;
-  }
+  .studyMaterialTable td:last-child { width: 45%; }
 }
 
-
-/* ============================= */
-/* Mobile View */
-/* ============================= */
+/* ── Responsive — Mobile ── */
 @media (max-width: 768px) {
-
   .studyMaterialHeaderBox,
   .studyMaterialBodyBox {
     padding: 14px;
@@ -276,73 +323,33 @@
     align-items: stretch;
   }
 
-  .studyMaterialSearch {
-    width: 100%;
-  }
+  .studyMaterialSearch { display: none; }
 
-  /* Make table scrollable */
-  .studyMaterialTableWrap {
-    overflow-x: auto;
-  }
-
-  .studyMaterialTable {
-    min-width: 600px;
-  }
-
-  /* Buttons smaller */
-  .studyMaterialViewBtn,
-  .studyMaterialDownloadBtn {
-    padding: 6px 12px;
-    font-size: 11px;
-  }
-
-  .studyMaterialActions {
-    flex-direction: column;
-    gap: 6px;
-    align-items: flex-end;
-  }
-}
-
-/* Mobile container bg */
-@media (max-width: 768px) {
+  .studyMaterialTableWrap { display: none; }
 
   .studyMaterialContent {
     background: #e8f4f4;
     padding: 16px;
     border-radius: 16px;
   }
-
-}
-/* ===== HIDE SEARCH ON MOBILE ===== */
-@media (max-width: 768px) {
-  .studyMaterialSearch {
-    display: none;
-  }
 }
 
-/* ===== TABLE / CARD SWITCH ===== */
-.studyMaterialMobile {
-  display: none;
-}
+/* ── Mobile Cards ── */
+.studyMaterialMobile { display: none; }
 
 @media (max-width: 768px) {
-
-  .studyMaterialTableWrap {
-    display: none;
-  }
-
-  .studyMaterialMobile {
-    display: block;
-  }
-
-}
-@media (max-width: 768px) {
+  .studyMaterialMobile { display: block; }
 
   .studyMaterialMobileHeader {
     display: flex;
     justify-content: space-between;
+    font-size: 11px;
     font-weight: 600;
-    margin-bottom: 12px;
+    color: #4a8c72;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 10px;
+    padding: 0 4px;
   }
 
   .studyMaterialCard {
@@ -350,18 +357,42 @@
     color: white;
     padding: 14px;
     border-radius: 14px;
-    margin-bottom: 14px;
+    margin-bottom: 12px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: default;
+  }
+  .studyMaterialCard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(23, 126, 134, 0.3);
+  }
+  .studyMaterialCard:active {
+    transform: translateY(0);
   }
 
   .studyMaterialCardTop {
     display: flex;
     justify-content: space-between;
     margin-bottom: 12px;
+    gap: 8px;
+  }
+
+  .studyMaterialCardTitle {
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    margin: 0;
+  }
+
+  .studyMaterialCardDate {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.75);
+    white-space: nowrap;
+    margin: 0;
   }
 
   .studyMaterialCardActions {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     flex-direction: row-reverse;
   }
 
@@ -371,7 +402,13 @@
     padding: 6px 16px;
     border-radius: 14px;
     color: white;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.15s;
   }
+  .viewBtn:hover { background: #27ae60; transform: scale(1.03); }
+  .viewBtn:active { transform: scale(0.97); }
 
   .downloadBtn {
     background: #6c8fa8;
@@ -379,6 +416,11 @@
     padding: 6px 16px;
     border-radius: 14px;
     color: white;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.15s;
   }
-
+  .downloadBtn:hover { background: #5a7a91; transform: scale(1.03); }
+  .downloadBtn:active { transform: scale(0.97); }
 }
