@@ -1,4 +1,4 @@
-/* PAGE */
+/* ── PAGE ── */
 .smd-page {
   padding: 24px 28px;
   background: #c8d0d3;
@@ -7,35 +7,39 @@
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  gap: 0;
 }
 
-/* BACK BUTTON */
+/* ── BACK BUTTON ── */
 .smd-back {
-  display: inline-flex;        /* ✅ prevents full width */
+  display: inline-flex;
   align-items: center;
-
   background: #2e7d8a;
   color: white;
   border: none;
-
-  padding: 6px 16px;           /* slightly tighter like before */
+  padding: 6px 16px;
   border-radius: 6px;
-
   cursor: pointer;
   font-size: 13px;
   font-weight: 500;
-
-  width: fit-content;          /* ✅ MOST IMPORTANT */
+  width: fit-content;
+  transition: background 0.2s, transform 0.15s;
+}
+.smd-back:hover {
+  background: #245f6b;
+  transform: translateX(-2px);
+}
+.smd-back:active {
+  transform: translateX(0) scale(0.97);
 }
 
-/* HEADER */
+/* ── HEADER ── */
 .smd-header {
   background: #eceff0;
   padding: 14px 22px;
   border-radius: 12px;
   margin-top: 12px;
 }
-
 .smd-header h2 {
   margin: 0;
   font-size: 18px;
@@ -43,7 +47,7 @@
   color: #1a1a1a;
 }
 
-/* MAIN WRAPPER */
+/* ── MAIN WRAPPER ── */
 .smd-wrapper {
   display: flex;
   gap: 32px;
@@ -57,31 +61,89 @@
   overflow: hidden;
 }
 
-/* LEFT */
+/* ── LEFT ── */
 .smd-left {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .smd-topic {
   font-size: 22px;
   font-weight: 700;
-  margin: 0 0 6px 0;
+  margin: 0;
   color: #111;
 }
 
 .smd-chapter {
   color: #555;
   font-size: 14px;
-  margin: 0 0 24px 0;
+  margin: 0;
 }
 
-/* NOTE */
+/* ── Meta Pills ── */
+.smd-meta-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.smd-meta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #f0f5f5;
+  border: 1px solid #d0e4e4;
+  color: #2e7d8a;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+/* ── NOTE ── */
+.smd-note {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.smd-note-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .smd-note-label {
   font-weight: 600;
   font-size: 15px;
-  margin: 0 0 8px 0;
+  margin: 0;
   color: #222;
+}
+
+.smd-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: 1px solid #c8dede;
+  color: #2e7d8a;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.smd-copy-btn:hover {
+  background: #eaf4f4;
+}
+.smd-copy-btn.copied {
+  background: #d4edda;
+  color: #155724;
+  border-color: #c3e6cb;
 }
 
 .smd-note-box {
@@ -95,7 +157,7 @@
   max-width: 460px;
 }
 
-/* RIGHT PANEL — fixed height for exactly 4 file rows */
+/* ── RIGHT PANEL ── */
 .smd-files-panel {
   width: 340px;
   flex-shrink: 0;
@@ -103,13 +165,12 @@
   border-radius: 14px;
   padding: 18px 16px;
   color: white;
-  /* header ~42px + 4 cards (56px each) + 3 gaps (10px each) + 16px bottom padding */
   height: 310px;
   display: flex;
   flex-direction: column;
 }
 
-/* FILES HEADER */
+/* ── FILES HEADER ── */
 .smd-files-header {
   text-align: center;
   font-weight: 600;
@@ -118,30 +179,29 @@
   flex-shrink: 0;
 }
 
-/* FILE LIST — scrollable if more than 4 */
+/* ── FILE LIST ── */
 .smd-files-list {
   display: flex;
   flex-direction: column;
   gap: 10px;
   overflow-y: auto;
   flex: 1;
-  /* hide scrollbar visually but keep functionality */
   scrollbar-width: thin;
   scrollbar-color: rgba(255,255,255,0.2) transparent;
 }
-
-.smd-files-list::-webkit-scrollbar {
-  width: 4px;
-}
-.smd-files-list::-webkit-scrollbar-track {
-  background: transparent;
-}
+.smd-files-list::-webkit-scrollbar { width: 4px; }
+.smd-files-list::-webkit-scrollbar-track { background: transparent; }
 .smd-files-list::-webkit-scrollbar-thumb {
   background: rgba(255,255,255,0.25);
   border-radius: 4px;
 }
 
-/* FILE CARD */
+/* ── FILE CARD ── */
+@keyframes fileCardIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 .smd-file-card {
   border: 1.5px dashed rgba(255,255,255,0.45);
   padding: 10px 12px;
@@ -151,9 +211,22 @@
   align-items: center;
   flex-shrink: 0;
   min-height: 56px;
+  cursor: pointer;
+  animation: fileCardIn 0.3s ease both;
+  transition: background 0.2s, border-color 0.2s, transform 0.15s;
+}
+.smd-file-card:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.6);
+  transform: translateY(-1px);
+}
+.smd-file-card.active {
+  background: rgba(255,255,255,0.14);
+  border-style: solid;
+  border-color: rgba(255,255,255,0.7);
 }
 
-/* FILE INFO */
+/* ── FILE INFO ── */
 .smd-file-info {
   display: flex;
   gap: 10px;
@@ -167,15 +240,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 6px;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
 }
 
-.smd-file-text {
-  min-width: 0;
+.smd-file-ext {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
 }
+
+.smd-file-text { min-width: 0; }
 
 .smd-file-name {
   font-size: 13px;
@@ -192,7 +268,7 @@
   opacity: 0.65;
 }
 
-/* ACTIONS */
+/* ── FILE ACTIONS ── */
 .smd-file-actions {
   display: flex;
   align-items: center;
@@ -209,12 +285,11 @@
   font-weight: 500;
   padding: 0;
   opacity: 0.9;
+  transition: opacity 0.15s;
+  white-space: nowrap;
 }
-
-.smd-view-btn:hover {
-  opacity: 1;
-  text-decoration: underline;
-}
+.smd-view-btn:hover { opacity: 1; text-decoration: underline; }
+.smd-view-btn.loading { opacity: 0.6; cursor: default; font-size: 11px; }
 
 .smd-download-btn {
   background: transparent;
@@ -226,8 +301,58 @@
   align-items: center;
   justify-content: center;
   opacity: 0.85;
+  text-decoration: none;
+  transition: opacity 0.15s, transform 0.15s;
+}
+.smd-download-btn:hover { opacity: 1; transform: translateY(-1px); }
+.smd-download-btn:active { transform: scale(0.93); }
+.smd-download-btn.done { opacity: 1; }
+
+/* ── No Files ── */
+.smd-no-files {
+  text-align: center;
+  color: rgba(255,255,255,0.5);
+  font-size: 13px;
+  padding: 24px 0;
 }
 
-.smd-download-btn:hover {
-  opacity: 1;
+/* ── Skeleton Loading ── */
+@keyframes shimmer {
+  from { background-position: -500px 0; }
+  to   { background-position: 500px 0; }
+}
+.smd-skeleton {
+  border-radius: 10px;
+  background: linear-gradient(90deg, #b8c4c8 25%, #a8b8bc 50%, #b8c4c8 75%);
+  background-size: 500px 100%;
+  animation: shimmer 1.4s infinite;
+}
+.smd-skeleton-back   { height: 30px; width: 80px; margin-bottom: 12px; }
+.smd-skeleton-header { height: 52px; margin-bottom: 16px; }
+.smd-skeleton-body   { flex: 1; border-radius: 22px; }
+
+/* ── Error ── */
+.smd-error {
+  background: #fff0f0;
+  color: #a33;
+  border-radius: 10px;
+  padding: 20px;
+  font-size: 14px;
+  text-align: center;
+  margin-top: 12px;
+}
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  .smd-wrapper {
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  .smd-files-panel {
+    width: 100%;
+    height: auto;
+    max-height: 320px;
+  }
+  .smd-note-box { max-width: 100%; }
+  .smd-file-name { max-width: 160px; }
 }
