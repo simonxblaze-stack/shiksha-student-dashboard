@@ -66,7 +66,7 @@ function SpeakingTile({ track, children }) {
    VIDEO TILE — identical to Teacher UI
 ═══════════════════════════════════════════════════════════ */
 
-function Tile({ track, localId, pinned, onPin, raisedHands, large }) {
+function Tile({ track, localId, pinned, onPin, raisedHands, large, isScreenShare }) {
   const p = track.participant;
   const name = p.name || p.identity || "?";
   const isLocal = p.identity === localId;
@@ -77,35 +77,44 @@ function Tile({ track, localId, pinned, onPin, raisedHands, large }) {
   const isCamOff = !p.isCameraEnabled;
   const hasHand = raisedHands[p.identity];
 
+  // Screen share tiles always show the video track
+  if (isScreenShare) {
+    return (
+      <div className={`pvt-tile pvt-tile-screenshare ${pinned ? "pvt-tile-pinned" : ""}`}>
+        <VideoTrack trackRef={track} />
+        <div className="pvt-tile-label">
+          🖥️ {isLocal ? `${name} (You)` : name}'s Screen
+        </div>
+        <button
+          className={`pvt-pin-btn ${pinned ? "pvt-pin-active" : ""}`}
+          onClick={(e) => { e.stopPropagation(); onPin(p.identity); }}
+          title={pinned ? "Unpin" : "Pin"}
+        >
+          {pinned ? "📌" : "📍"}
+        </button>
+      </div>
+    );
+  }
+
   return (
     <SpeakingTile track={track}>
       {(isSpeaking) => (
         <div className={`pvt-tile ${isSpeaking ? "pvt-tile-speaking" : ""} ${pinned ? "pvt-tile-pinned" : ""}`}>
-          {/* Video or placeholder */}
           {!isCamOff && (track.publication?.isSubscribed || isLocal) ? (
             <VideoTrack trackRef={track} />
           ) : (
             <ParticipantPlaceholder name={name} large={large} />
           )}
 
-          {/* Muted bar */}
-          {isMuted && (
-            <div className="pvt-muted-bar">🔇 Muted</div>
-          )}
+          {isMuted && <div className="pvt-muted-bar">🔇 Muted</div>}
+          {hasHand && <div className="pvt-hand-indicator">🖐</div>}
 
-          {/* Raised hand */}
-          {hasHand && (
-            <div className="pvt-hand-indicator">🖐</div>
-          )}
-
-          {/* Name label */}
           <div className="pvt-tile-label">
             {isTeacher && <span className="pvt-host-badge">HOST</span>}
             {isLocal ? `${name} (You)` : name}
             {isSpeaking && <span className="pvt-speaking-dot">●</span>}
           </div>
 
-          {/* Pin button */}
           <button
             className={`pvt-pin-btn ${pinned ? "pvt-pin-active" : ""}`}
             onClick={(e) => { e.stopPropagation(); onPin(p.identity); }}
@@ -295,20 +304,29 @@ export default function PrivateClassroomUI({ role, session }) {
     });
   };
 
-  // ── Grid layout ──
+  // ── Grid layout — Google Meet style ──
+  const allTracks = [...screenTracks, ...cameraTracks];
+  const totalTiles = allTracks.length;
 
-  const camCount = cameraTracks.length;
   const gridClass =
-    camCount <= 1 ? "pvt-grid-1" :
-    camCount === 2 ? "pvt-grid-2" :
-    camCount === 3 ? "pvt-grid-3" :
-    camCount === 4 ? "pvt-grid-4" : "pvt-grid-many";
+    totalTiles <= 1 ? "pvt-grid-1" :
+    totalTiles === 2 ? "pvt-grid-2" :
+    totalTiles <= 4 ? "pvt-grid-4" :
+    totalTiles <= 6 ? "pvt-grid-6" :
+    totalTiles <= 9 ? "pvt-grid-9" : "pvt-grid-many";
 
-  const sortedCameraTracks = [...cameraTracks].sort((a, b) => {
+  const sortedAllTracks = [...allTracks].sort((a, b) => {
     const aPin = pinnedIds.has(a.participant.identity) ? 0 : 1;
     const bPin = pinnedIds.has(b.participant.identity) ? 0 : 1;
-    return aPin - bPin;
+    if (aPin !== bPin) return aPin - bPin;
+    const aScreen = a.source === Track.Source.ScreenShare ? 0 : 1;
+    const bScreen = b.source === Track.Source.ScreenShare ? 0 : 1;
+    return aScreen - bScreen;
   });
+
+  const pinnedTracks = sortedAllTracks.filter(t => pinnedIds.has(t.participant.identity));
+  const unpinnedTracks = sortedAllTracks.filter(t => !pinnedIds.has(t.participant.identity));
+  const showSpotlight = pinnedTracks.length === 1 && totalTiles > 1;
 
   return (
     <div className="pvt-room">
@@ -334,36 +352,49 @@ export default function PrivateClassroomUI({ role, session }) {
       {/* ── Main Area ── */}
       <div className="pvt-main">
         <div className="pvt-video-area">
-          {screenTracks.length > 0 ? (
+          {showSpotlight ? (
+            /* ── Spotlight layout: 1 pinned large + rest in strip ── */
             <div className="pvt-screen-layout">
               <div className="pvt-screen-main">
-                <VideoTrack trackRef={screenTracks[0]} />
+                {pinnedTracks[0].source === Track.Source.ScreenShare ? (
+                  <VideoTrack trackRef={pinnedTracks[0]} />
+                ) : (
+                  <Tile
+                    key={pinnedTracks[0].participant.identity + "-pin"}
+                    track={pinnedTracks[0]}
+                    localId={localParticipant.identity}
+                    pinned={true} onPin={togglePin}
+                    raisedHands={raisedHands} large={true}
+                    isScreenShare={false}
+                  />
+                )}
               </div>
               <div className="pvt-screen-strip">
-                {sortedCameraTracks.map((track) => (
+                {unpinnedTracks.map((track) => (
                   <Tile
-                    key={track.participant.identity}
+                    key={track.participant.identity + "-" + track.source}
                     track={track}
                     localId={localParticipant.identity}
-                    pinned={pinnedIds.has(track.participant.identity)}
-                    onPin={togglePin}
-                    raisedHands={raisedHands}
-                    large={false}
+                    pinned={false} onPin={togglePin}
+                    raisedHands={raisedHands} large={false}
+                    isScreenShare={track.source === Track.Source.ScreenShare}
                   />
                 ))}
               </div>
             </div>
           ) : (
+            /* ── Grid layout: all tiles in even Google Meet grid ── */
             <div className={`pvt-video-grid ${gridClass}`}>
-              {sortedCameraTracks.map((track) => (
+              {sortedAllTracks.map((track) => (
                 <Tile
-                  key={track.participant.identity}
+                  key={track.participant.identity + "-" + track.source}
                   track={track}
                   localId={localParticipant.identity}
                   pinned={pinnedIds.has(track.participant.identity)}
                   onPin={togglePin}
                   raisedHands={raisedHands}
-                  large={camCount <= 2}
+                  large={totalTiles <= 2}
+                  isScreenShare={track.source === Track.Source.ScreenShare}
                 />
               ))}
             </div>

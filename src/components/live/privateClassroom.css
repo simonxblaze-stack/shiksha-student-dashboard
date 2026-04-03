@@ -76,11 +76,13 @@
   height: 100%;
 }
 
+/* Google Meet-style grid — tiles always fill evenly, no irregular shapes */
 .pvt-grid-1 { grid-template-columns: 1fr; grid-template-rows: 1fr; }
 .pvt-grid-2 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr; }
-.pvt-grid-3 { grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr; }
 .pvt-grid-4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
-.pvt-grid-many { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); grid-auto-rows: 1fr; }
+.pvt-grid-6 { grid-template-columns: repeat(3, 1fr); grid-template-rows: 1fr 1fr; }
+.pvt-grid-9 { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); }
+.pvt-grid-many { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); grid-auto-rows: 1fr; }
 
 /* ── Video Tile ── */
 .pvt-tile {
@@ -100,7 +102,8 @@
 .pvt-tile video {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  background: #111827;
 }
 
 .pvt-tile-sm {
@@ -149,6 +152,11 @@
 
 .pvt-placeholder-name {
   font-size: 12px; color: #6b7591;
+}
+
+/* ── Screen share tile override — contain to show full screen ── */
+.pvt-tile-screenshare video {
+  object-fit: contain;
 }
 
 /* ── Screen Share Layout ── */

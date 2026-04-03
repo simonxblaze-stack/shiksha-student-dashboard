@@ -96,6 +96,10 @@ const privateSession = {
  * Frontend expects: teacher, date, time, etc.
  */
 function transformSession(s) {
+  // Prefer actual_duration_minutes (computed from started_at/ended_at) over scheduled duration
+  const actualDur = s.actual_duration_minutes;
+  const scheduledDur = s.duration_minutes;
+  const displayDur = actualDur || scheduledDur;
   return {
     id: s.id,
     subject: s.subject,
@@ -107,8 +111,9 @@ function transformSession(s) {
     studentId: s.student_id,
     date: s.scheduled_date,
     time: s.scheduled_time,
-    duration: s.duration_minutes ? `${s.duration_minutes} mins` : "",
+    duration: displayDur ? `${displayDur} mins` : "",
     durationMinutes: s.duration_minutes,
+    actualDurationMinutes: s.actual_duration_minutes,
     status: s.status,
     sessionType: s.session_type,
     groupStrength: s.group_strength,
