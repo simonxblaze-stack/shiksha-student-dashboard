@@ -11,15 +11,21 @@
 
 /* BACK BUTTON */
 .smd-back {
+  display: inline-flex;        /* ✅ prevents full width */
+  align-items: center;
+
   background: #2e7d8a;
   color: white;
   border: none;
-  padding: 8px 18px;
-  border-radius: 8px;
+
+  padding: 6px 16px;           /* slightly tighter like before */
+  border-radius: 6px;
+
   cursor: pointer;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
-  letter-spacing: 0.2px;
+
+  width: fit-content;          /* ✅ MOST IMPORTANT */
 }
 
 /* HEADER */
