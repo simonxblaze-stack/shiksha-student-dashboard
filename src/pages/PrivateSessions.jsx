@@ -714,95 +714,67 @@ function RequestForm({ onBack, onSubmit }) {
 }
 
 function Step1({ data, setData }) {
-  const [subjects, setSubjects] = useState([]);
   const [teachers, setTeachers] = useState([]);
-  const [loadingSubjects, setLoadingSubjects] = useState(true);
   const [loadingTeachers, setLoadingTeachers] = useState(false);
+  const [subjects, setSubjects] = useState(privateSession.SUBJECTS);
+  const [loadingSubjects, setLoadingSubjects] = useState(true);
 
-  // ✅ Load subjects from backend
+  // Fetch subjects dynamically from backend, fallback to hardcoded list
   useEffect(() => {
     setLoadingSubjects(true);
-    privateSession.getSubjects()
+    privateSession.getSubjectsByCourse()
       .then((res) => {
-        setSubjects(res || []);
+        // API may return array of strings, array of {name}, or grouped object
+        let list = [];
+        if (Array.isArray(res)) {
+          list = res.map((s) => (typeof s === "string" ? s : s.name || s.subject_name || String(s)));
+        } else if (res && typeof res === "object") {
+          // Grouped by course — flatten all subjects
+          Object.values(res).forEach((arr) => {
+            if (Array.isArray(arr)) arr.forEach((s) => list.push(typeof s === "string" ? s : s.name || String(s)));
+          });
+        }
+        if (list.length > 0) {
+          const unique = [...new Set(list)].sort();
+          setSubjects(unique);
+          // If current subject not in new list, reset to first
+          if (!unique.includes(data.subject)) {
+            setData((prev) => ({ ...prev, subject: unique[0], teacher: null }));
+          }
+        }
       })
-      .catch(() => setSubjects([]))
+      .catch(() => { /* keep fallback SUBJECTS */ })
       .finally(() => setLoadingSubjects(false));
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ✅ Load teachers when subject changes
   useEffect(() => {
-    if (!data.subject_id) return;
-
     setLoadingTeachers(true);
-    privateSession.getTeachersBySubject(data.subject_id)
-      .then((res) => setTeachers(res || []))
-      .catch(() => setTeachers([]))
-      .finally(() => setLoadingTeachers(false));
-  }, [data.subject_id]);
+    privateSession.getTeachers(data.subject).then((list) => { setTeachers(list); setLoadingTeachers(false); }).catch(() => setLoadingTeachers(false));
+  }, [data.subject]);
 
   return (
     <div>
-      {/* SUBJECT */}
       <div className="ps__fieldRow" style={{ alignItems: "center" }}>
         <label className="ps__fieldLabel">Subject :</label>
-
         {loadingSubjects ? (
-          <span style={{ fontSize: 13, color: "#6b7280" }}>
-            Loading subjects...
-          </span>
+          <span style={{ fontSize: 13, color: "#6b7280" }}>Loading subjects...</span>
         ) : (
-          <select
-            className="ps__select"
-            value={data.subject_id || ""}
-            onChange={(e) => {
-              const selected = subjects.find(s => s.id === e.target.value);
-
-              setData({
-                ...data,
-                subject_id: e.target.value,   // ✅ IMPORTANT
-                subject: selected?.name || "", // for display only
-                teacher: null,
-              });
-            }}
-          >
-            <option value="">Select Subject</option>
-            {subjects.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
-              </option>
-            ))}
+          <select className="ps__select" value={data.subject} onChange={(e) => setData({ ...data, subject: e.target.value, teacher: null })}>
+            {subjects.map((s) => <option key={s}>{s}</option>)}
           </select>
         )}
       </div>
-
-      {/* TEACHERS */}
-      <div className="ps__sectionLabel">
-        Teachers for {data.subject || "selected subject"} :
-      </div>
-
-      {loadingTeachers ? (
-        <div style={{ padding: 20, color: "#6b7280" }}>
-          Loading teachers...
-        </div>
-      ) : teachers.length === 0 ? (
-        <div style={{ padding: 20, color: "#6b7280" }}>
-          No teachers found for this subject.
-        </div>
+      <div className="ps__sectionLabel">Teachers for {data.subject} :</div>
+      {loadingTeachers ? (<div style={{ padding: 20, color: "#6b7280" }}>Loading teachers...</div>
+      ) : teachers.length === 0 ? (<div style={{ padding: 20, color: "#6b7280" }}>No teachers found for this subject.</div>
       ) : (
         <div className="ps__teacherGrid">
           {teachers.map((t) => (
-            <div
-              key={t.id}
-              className={`ps__teacherCard ${
-                data.teacher?.id === t.id ? "selected" : ""
-              }`}
-              onClick={() => setData({ ...data, teacher: t })}
-            >
+            <div key={t.id} className={`ps__teacherCard ${data.teacher?.id === t.id ? "selected" : ""}`} onClick={() => setData({ ...data, teacher: t })}>
               <TeacherAvatar name={t.name} size={42} />
-
               <div className="ps__teacherInfo">
                 <div className="ps__teacherName">{t.name}</div>
+                <div className="ps__teacherMeta"><span>{t.subject}</span>{t.rating && <Stars count={t.rating} />}</div>
               </div>
             </div>
           ))}
