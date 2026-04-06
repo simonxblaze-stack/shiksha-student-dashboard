@@ -23,18 +23,17 @@ const privateSession = {
   },
 
   // ── Request a session ──
-  // Accepts frontend field names → maps to backend field names
   async requestSession(formData) {
     const payload = {
-      teacher_id: formData.teacherId,
-      subject: formData.subject,
-      scheduled_date: formData.scheduledDate,
-      scheduled_time: formData.scheduledTime,
-      duration_minutes: formData.durationMinutes,
-      session_type: formData.studentIds && formData.studentIds.length > 0 ? "group" : "one_on_one",
-      group_strength: (formData.studentIds?.length || 0) + 1, // +1 for requester
-      notes: formData.note || "",
-      student_ids: formData.studentIds || [],
+      teacher_id: formData.teacher_id,
+      subject_id: formData.subject_id,
+      scheduled_date: formData.scheduled_date,
+      scheduled_time: formData.scheduled_time,
+      duration_minutes: formData.duration_minutes,
+      session_type: formData.session_type || "one_on_one",
+      group_strength: formData.group_strength || 1,
+      notes: formData.notes || "",
+      student_ids: formData.student_ids || [],
     };
     const res = await api.post("/sessions/request/", payload);
     return transformSession(res.data);
@@ -63,11 +62,11 @@ const privateSession = {
     return res.data; // { livekit_url, token, room, role }
   },
 
-  // ── Teachers list (for request form) ──
-  async getTeachers(subject) {
-    const params = subject ? { subject } : {};
-    const res = await api.get("/accounts/teachers/", { params });
-    return res.data;
+  // ── Teachers for a subject (by UUID) ──
+  async getTeachers(subjectId) {
+    if (!subjectId) return [];
+    const res = await api.get(`/sessions/subjects/${subjectId}/teachers/`);
+    return res.data || [];
   },
 
   // ── Validate student ID (for group form) ──
@@ -76,14 +75,81 @@ const privateSession = {
     return res.data; // { valid, name, user_id, student_id }
   },
 
-  // ── Dynamic subject fetching ──
-  async getSubjectsByCourse(courseTitle) {
-    const params = courseTitle ? { course_title: courseTitle } : {};
-    const res = await api.get("/courses/subjects-by-course/", { params });
-    return res.data; // array of { id, name } or grouped object
+  // ── Only subjects for THIS student's enrolled course ──
+  async getSubjectsByCourse() {
+    const res = await api.get("/courses/subjects/mine/");
+    return res.data || [];
   },
 
-  // ── Constants (fallback) ──
+  // ── Teacher-side methods (used by teacher dashboard) ──
+  async getTeacherSessions() {
+    const res = await api.get("/sessions/teacher/sessions/");
+    return res.data.map(transformSession);
+  },
+
+  async getRequests() {
+    const res = await api.get("/sessions/teacher/requests/");
+    return res.data.map(transformSession);
+  },
+
+  async getHistory() {
+    const res = await api.get("/sessions/teacher/history/");
+    return res.data.map(transformSession);
+  },
+
+  async acceptRequest(sessionId, data = {}) {
+    const res = await api.post(`/sessions/${sessionId}/accept/`, data);
+    return transformSession(res.data);
+  },
+
+  async declineRequest(sessionId, reason = "") {
+    const res = await api.post(`/sessions/${sessionId}/decline/`, { reason });
+    return transformSession(res.data);
+  },
+
+  async rescheduleRequest(sessionId, { new_date, new_time, note = "" }) {
+    const res = await api.post(`/sessions/${sessionId}/reschedule/`, {
+      scheduled_date: new_date,
+      scheduled_time: new_time,
+      reason: note,
+    });
+    return transformSession(res.data);
+  },
+
+  async startSession(sessionId) {
+    const res = await api.post(`/sessions/${sessionId}/start/`);
+    return transformSession(res.data);
+  },
+
+  async endSession(sessionId) {
+    const res = await api.post(`/sessions/${sessionId}/end/`);
+    return transformSession(res.data);
+  },
+
+  async teacherCancelSession(sessionId, reason = "") {
+    const res = await api.post(`/sessions/${sessionId}/teacher-cancel/`, { reason });
+    return transformSession(res.data);
+  },
+
+  async getAvailability() {
+    try {
+      const res = await api.get("/sessions/teacher/availability/");
+      return res.data;
+    } catch {
+      return {};
+    }
+  },
+
+  async saveAvailability(data) {
+    try {
+      const res = await api.post("/sessions/teacher/availability/", data);
+      return res.data;
+    } catch {
+      return { success: false };
+    }
+  },
+
+  // ── Constants ──
   SUBJECTS: ["Mathematics", "Science", "Physics", "Chemistry", "English", "History", "Biology"],
   TIME_SLOTS: [
     { label: "3:00 PM - 5:00 PM", value: "15:00" },
@@ -95,22 +161,20 @@ const privateSession = {
     { label: "60 minutes", value: 60 },
     { label: "90 minutes", value: 90 },
   ],
+  DAYS: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
 };
 
 /**
  * Transform backend response → frontend-friendly shape.
- * Backend returns: teacher_name, scheduled_date, scheduled_time, etc.
- * Frontend expects: teacher, date, time, etc.
  */
 function transformSession(s) {
-  // Prefer actual_duration_minutes (computed from started_at/ended_at) over scheduled duration
   const actualDur = s.actual_duration_minutes;
   const scheduledDur = s.duration_minutes;
   const displayDur = actualDur || scheduledDur;
   return {
     id: s.id,
     subject: s.subject,
-    topic: s.subject, // backend doesn't have a separate topic field
+    topic: s.subject,
     teacher: s.teacher_name,
     teacherId: s.teacher_id,
     requestedBy: s.student_name,
@@ -127,17 +191,14 @@ function transformSession(s) {
     note: s.notes,
     notes: s.notes,
     roomName: s.room_name,
-    // Reschedule fields
     rescheduledDate: s.rescheduled_date,
     rescheduledTime: s.rescheduled_time,
     rescheduleReason: s.reschedule_reason,
     teacherNote: s.reschedule_reason,
     originalDate: s.rescheduled_date ? s.scheduled_date : null,
     originalTime: s.rescheduled_time ? s.scheduled_time : null,
-    // Participants (for group sessions)
     participants: s.participants || [],
     students: (s.participants || []).map((p) => p.name),
-    // Timestamps
     createdAt: s.created_at,
     updatedAt: s.updated_at,
     startedAt: s.started_at,
