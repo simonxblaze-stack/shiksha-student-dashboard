@@ -17,9 +17,11 @@ export default function Subjects({ mode }) {
   const filteredSubjects = subjects.filter((subject) =>
     subject.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  const subjectImages = {
-  "Mathematics": "/images/class8-math.png",
-  
+  const getImage = (name) => {
+  if (name.includes("Math")) return "/images/class8-math.png";
+  if (name.includes("English")) return "/images/class9-english.png";
+  if (name.includes("Science")) return "/images/class8-science.png";
+  return "/images/default.png";
 };
   useEffect(() => {
     if (courseLoading) return;
@@ -65,7 +67,7 @@ export default function Subjects({ mode }) {
             filteredSubjects.map((subject) => (
               <SubjectCard
                 key={subject.id}
-                img={subjectImages[subject.name] || "/images/default.png"}
+                img={getImage(subject.name)}
                 subject={subject.name}
                 teacher={
                   subject.teachers?.length
