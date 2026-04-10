@@ -153,7 +153,7 @@ export default function Header({ toggleMenu, menuOpen }) {
   className="header__profileItem"
   onClick={() => {
     setProfileOpen(false);
-    window.location.href = "https://shikshacom.com/";
+    window.location.href = import.meta.env.VITE_HOME_URL || "https://shikshacom.com/";
   }}
 >
   <span>Return to Homepage</span>
