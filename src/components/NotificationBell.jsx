@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { IoNotificationsOutline, IoNotificationsSharp } from "react-icons/io5";
 import useNotificationSocket from "../hooks/useNotificationSocket";
 
@@ -18,6 +19,14 @@ const TYPE_COLORS = {
   forum: "#3b82f6",
 };
 
+const TYPE_ROUTES = {
+  assignment: "/assignments",
+  quiz: "/subjects",
+  live_session: "/live-sessions",
+  material: "/subjects",
+  forum: "/forum",
+};
+
 function timeAgo(isoString) {
   if (!isoString) return "";
   const diff = Math.floor((Date.now() - new Date(isoString)) / 1000);
@@ -30,10 +39,10 @@ function timeAgo(isoString) {
 export default function NotificationBell() {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
+  const navigate = useNavigate();
   const { notifications, unreadCount, markAllRead, clearNotifications } =
     useNotificationSocket();
 
-  // Close on outside click
   useEffect(() => {
     const handler = (e) => {
       if (ref.current && !ref.current.contains(e.target)) {
@@ -47,6 +56,29 @@ export default function NotificationBell() {
   const handleOpen = () => {
     setOpen((prev) => !prev);
     if (!open) markAllRead();
+  };
+
+  const handleNotifClick = (notif) => {
+    const type = notif?.type || notif?.data?.type;
+    const route = TYPE_ROUTES[type];
+    if (route) {
+      navigate(route);
+      setOpen(false);
+    }
+  };
+
+  const getTitle = (notif) => {
+    return notif?.title || notif?.data?.title ||
+           notif?.message || notif?.data?.message ||
+           "New notification";
+  };
+
+  const getType = (notif) => {
+    return notif?.type || notif?.data?.type;
+  };
+
+  const getTime = (notif) => {
+    return notif?.time || notif?.data?.time;
   };
 
   return (
@@ -83,20 +115,18 @@ export default function NotificationBell() {
                 <div
                   key={i}
                   className="notif-bell-item"
+                  onClick={() => handleNotifClick(notif)}
                   style={{
-                    borderLeft: `3px solid ${TYPE_COLORS[notif?.data?.type] || "#6b7280"}`,
+                    borderLeft: `3px solid ${TYPE_COLORS[getType(notif)] || "#6b7280"}`,
+                    cursor: "pointer",
                   }}
                 >
                   <span className="notif-bell-icon">
-                    {TYPE_ICONS[notif?.data?.type] || "🔔"}
+                    {TYPE_ICONS[getType(notif)] || "🔔"}
                   </span>
                   <div className="notif-bell-content">
-                    <p className="notif-bell-title">
-                      {notif?.data?.title || notif?.data?.message || "New notification"}
-                    </p>
-                    {notif?.data?.time && (
-                      <p className="notif-bell-time">{timeAgo(notif.data.time)}</p>
-                    )}
+                    <p className="notif-bell-title">{getTitle(notif)}</p>
+                    <p className="notif-bell-time">{timeAgo(getTime(notif))}</p>
                   </div>
                 </div>
               ))
