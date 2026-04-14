@@ -529,56 +529,28 @@
   }
 
   .mobileOnly {
-    display: flex !important;
-    flex-direction: column;
-    min-height: 0;
-    height: 100%;
-    overflow: hidden;
+    display: block !important;
+    width: 100%;
+    height: auto;
+    overflow: visible;
   }
 
   .dashExact {
     padding: 12px;
     gap: 12px;
-    height: 100dvh;
-    min-height: 100dvh;
+    height: auto;
+    min-height: calc(100dvh - 72px);
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
-    padding-bottom: calc(90px + env(safe-area-inset-bottom));
+    padding-bottom: 24px;
     box-sizing: border-box;
   }
 
   .mobileSectionBody {
     width: 100%;
-    padding: 0 0 8px;
-    min-height: 0;
-    height: auto;
-    overflow: visible;
-  }
-
-  .mobileSectionContent {
-    gap: 10px;
-    margin-top: 10px;
-  }
-
-  .mobileSectionTopAction {
-    margin-bottom: 8px;
-  }
-
-  .mobileCalendarCard {
-    padding: 12px;
-    margin-top: 10px;
-  }
-
-  .sessionCard,
-  .calendarBox,
-  .whiteCard {
-    width: 100%;
-    margin-left: 0;
-    margin-right: 0;
-    height: auto;
-    max-height: none;
-    overflow: visible;
+    padding: 2px 0 16px;
+    margin: 0;
   }
 
   .listBody,
@@ -587,6 +559,5 @@
     height: auto;
     max-height: none;
     overflow: visible;
-    
   }
 }
