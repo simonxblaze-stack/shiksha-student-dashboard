@@ -531,22 +531,27 @@
   .mobileOnly {
     display: flex !important;
     flex-direction: column;
-    min-height: auto;
-    overflow: visible;
+    min-height: 0;
+    height: 100%;
+    overflow: hidden;
   }
 
   .dashExact {
     padding: 12px;
     gap: 12px;
-    min-height: auto;
-    height: auto;
-    overflow: visible;
+    height: 100dvh;
+    min-height: 100dvh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: calc(90px + env(safe-area-inset-bottom));
+    box-sizing: border-box;
   }
 
   .mobileSectionBody {
     width: 100%;
     padding: 0 0 8px;
-    min-height: auto;
+    min-height: 0;
     height: auto;
     overflow: visible;
   }
