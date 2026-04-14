@@ -5,9 +5,8 @@
   flex-direction: column;
   gap: 16px;
   padding: 24px;
-  background: #bfd4d8;
-  height: 100vh;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   box-sizing: border-box;
 }
 
@@ -530,25 +529,40 @@
   }
 
   .mobileOnly {
-    display: block !important;
+    display: flex !important;
+    flex-direction: column;
+    min-height: auto;
+    overflow: visible;
+  }
+
+  .dashExact {
+    padding: 12px;
+    gap: 12px;
+    min-height: auto;
+    height: auto;
+    overflow: visible;
   }
 
   .mobileSectionBody {
     width: 100%;
     padding: 0 0 8px;
+    min-height: auto;
+    height: auto;
+    overflow: visible;
   }
 
   .mobileSectionContent {
     gap: 10px;
     margin-top: 10px;
   }
-  
+
   .mobileSectionTopAction {
     margin-bottom: 8px;
   }
 
   .mobileCalendarCard {
     padding: 12px;
+    margin-top: 10px;
   }
 
   .sessionCard,
@@ -557,10 +571,16 @@
     width: 100%;
     margin-left: 0;
     margin-right: 0;
+    height: auto;
+    max-height: none;
+    overflow: visible;
   }
-}
-@media (max-width: 768px) {
-  .mobileCalendarCard {
-    margin-top: 10px;
+
+  .listBody,
+  .notifBody,
+  .scheduleList {
+    height: auto;
+    max-height: none;
+    overflow: visible;
   }
 }

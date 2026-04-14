@@ -1,7 +1,6 @@
 @media (max-width: 768px) {
   .topSliderTabs {
     position: sticky;
-    top: 56px;
     z-index: 20;
     width: 100%;
     background: transparent;

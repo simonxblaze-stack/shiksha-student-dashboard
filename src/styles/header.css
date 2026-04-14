@@ -242,6 +242,23 @@ text-align: center;
     display: none;
   }
 }
+
+@media (max-width: 768px) {
+  .header__right {
+    position: relative;
+  }
+
+  .header__profileDropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 8px;
+    left: auto;
+    min-width: 220px;
+    max-width: calc(100vw - 24px);
+    z-index: 50;
+  }
+}
+
 @media (max-width: 768px) {
   .header__hamburger,
   .header__hamburger * {
