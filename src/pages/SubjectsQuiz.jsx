@@ -42,18 +42,18 @@ export default function SubjectsQuiz() {
   "hindi (vitan ii)": "/images/hindi.png",
   "hindi (grammer)": "/images/hindi.png",
 
-  "social science (civics)": "/images/Civics.jpeg",
+  "social science (civics)": "/images/Civics.jpg",
   "social science (history)": "/images/history.jpeg",
   "social science (geography)": "/images/geography.jpg",
   "social science (economics)": "/images/eco.jpeg",
 
   "3a: social science - history (our pasts iii)": "/images/history.jpeg",
   "3b: social science – geography (resources and development)": "/images/geography.jpg",
-  "3c: social science - civics (social and political life iii)": "/images/Civics.jpeg",
+  "3c: social science - civics (social and political life iii)": "/images/Civics.jpg",
 
   "3a: social science – history": "/images/history.jpeg",
   "3b: social science – geography": "/images/geography.jpg",
-  "3c: social science – civics": "/images/Civics.jpeg",
+  "3c: social science – civics": "/images/Civics.jpg",
   "3d: social science – economics": "/images/eco.jpeg",
 
   "history": "/images/history.jpeg",
@@ -75,7 +75,7 @@ export default function SubjectsQuiz() {
   "business studies": "/images/business study.jpeg",
 
   "chemistry": "/images/chem.jpeg",
-  "physics": "/images/phys.jpg",
+  "physics": "/images/phys.jpeg",
   "biology": "/images/bio.jpeg",
 
   "sociology": "/images/sociology.jpeg",
