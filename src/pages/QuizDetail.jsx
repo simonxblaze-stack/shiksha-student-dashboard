@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useBlocker } from "react-router-dom";
 import api from "../api/apiClient";
 import "../styles/QuizDetail.css";
 
@@ -112,17 +112,29 @@ export default function QuizDetail() {
   const [timeLeft, setTimeLeft]          = useState(null);
   const [palette, setPalette]            = useState({});
   const [showExitModal, setShowExitModal] = useState(false);
-  const [tabWarning, setTabWarning]      = useState(false); // tab-switch warning banner
   const [quizReady, setQuizReady]        = useState(false);
 
-  const answersRef   = useRef({});
-  const submittedRef = useRef(false);
-  const durationRef  = useRef(null);
-  const startTimeRef = useRef(null);
+  const answersRef    = useRef({});
+  const submittedRef  = useRef(false);
+  const mountedRef    = useRef(true);   // false after unmount — prevents auto-submit firing after nav away
+  const durationRef   = useRef(null);
+  const startTimeRef  = useRef(null);
   const attemptKeyRef = useRef("1"); // will be set to attempt_number from backend
 
   // ── fetch + start ──────────────────────────────────────────────────────────
   useEffect(() => {
+    // Direct submit used when time expired while component was unmounted
+    async function handleAutoSubmitImmediate(answerEntries) {
+      try {
+        const formatted = answerEntries.map(([q, c]) => ({ question: q, selected_choice: c }));
+        await api.post(`/student/quizzes/${quizId}/submit/`, { answers: formatted });
+        navigate(`/subjects/quiz/${subjectId}/result/${quizId}`);
+      } catch (err) {
+        setError("Time is up — your quiz was submitted. " + (err.response?.data?.detail || ""));
+        setLoading(false);
+      }
+    }
+
     async function initQuiz() {
       try {
         setLoading(true);
@@ -172,7 +184,20 @@ export default function QuizDetail() {
         durationRef.current = (res.data.time_limit_minutes || 5) * 60;
 
         const elapsed = Math.floor((Date.now() - st) / 1000);
-        setTimeLeft(Math.max(0, durationRef.current - elapsed));
+        const remaining = durationRef.current - elapsed;
+
+        // If time already ran out while student was away, auto-submit immediately
+        // rather than letting the interval catch it — gives a cleaner UX
+        if (remaining <= 0) {
+          setTimeLeft(0);
+          setLoading(false);
+          submittedRef.current = true;
+          localStorage.removeItem(`quiz_${quizId}_start`);
+          await handleAutoSubmitImmediate(Object.entries(answersRef.current));
+          return;
+        }
+
+        setTimeLeft(remaining);
         setQuizReady(true);
       } catch (err) {
         setError(err.response?.data?.detail || "Unable to load quiz.");
@@ -183,31 +208,27 @@ export default function QuizDetail() {
     if (quizId) initQuiz();
   }, [quizId]);
 
-  // ── Tab-switch detection ───────────────────────────────────────────────────
-  // Shows a warning banner when the student switches tabs/minimises window.
-  // Does NOT pause the timer (timer runs on wall-clock time, not ticks).
-  // Does NOT show a re-entry popup — just the banner so they know we noticed.
+  // Set mountedRef false on unmount — prevents auto-submit firing after sidebar navigation
   useEffect(() => {
-    if (!quizReady) return;
+    mountedRef.current = true;
+    return () => { mountedRef.current = false; };
+  }, []);
 
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "hidden") {
-        // Student left the tab — nothing to pause, timer keeps running
-        // We just record it so we can show a warning on return
-      } else {
-        // Student came back — show warning banner
-        setTabWarning(true);
-        // Auto-dismiss after 5 seconds
-        setTimeout(() => setTabWarning(false), 5000);
-      }
-    };
-
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
-  }, [quizReady]);
+  // ── Block in-app navigation while quiz is active ─────────────────────────
+  // useBlocker intercepts NavLink / navigate() clicks within the SPA.
+  // When the student clicks Recordings, Assignments etc. in the sidebar
+  // this shows a confirmation modal instead of silently navigating away.
+  const blocker = useBlocker(
+    ({ currentLocation, nextLocation }) =>
+      quizReady &&
+      !submittedRef.current &&
+      currentLocation.pathname !== nextLocation.pathname
+  );
 
   // ── Auto-submit ────────────────────────────────────────────────────────────
   const handleAutoSubmit = useCallback(async () => {
+    // Don't submit if student navigated away — they can resume later
+    if (!mountedRef.current) return;
     try {
       const formatted = Object.entries(answersRef.current).map(([q, c]) => ({
         question: q, selected_choice: c,
@@ -218,6 +239,7 @@ export default function QuizDetail() {
     } catch (err) {
       // Retry once
       setTimeout(async () => {
+        if (!mountedRef.current) return;
         try {
           const formatted = Object.entries(answersRef.current).map(([q, c]) => ({
             question: q, selected_choice: c,
@@ -328,7 +350,13 @@ export default function QuizDetail() {
       submittedRef.current = true;
       navigate(`/subjects/quiz/${subjectId}/result/${quizId}`);
     } catch (err) {
-      setError(err.response?.data?.detail || "Failed to submit quiz.");
+      // Show the real backend reason (expired, not enrolled, etc.)
+      const msg = err.response?.data?.detail
+        || (err.response?.data && typeof err.response.data === 'object'
+            ? Object.values(err.response.data).flat().join(' ')
+            : null)
+        || "Failed to submit quiz. Please check your connection and try again.";
+      setError(msg);
     } finally {
       setSubmitting(false);
     }
@@ -345,16 +373,6 @@ export default function QuizDetail() {
 
   return (
     <div className="quiz-page">
-
-      {/* TAB-SWITCH WARNING BANNER */}
-      {tabWarning && (
-        <div className="quiz-tab-warning">
-          ⚠️ Switching tabs during a quiz is not allowed. The timer kept running.
-          <button className="quiz-tab-warning-close" onClick={() => setTabWarning(false)}>
-            ✕
-          </button>
-        </div>
-      )}
 
       {/* TOP BAR */}
       <div className="quiz-top-bar">
@@ -463,6 +481,36 @@ export default function QuizDetail() {
           </button>
         </div>
       </div>
+
+      {/* NAVIGATION BLOCK MODAL — fires when student clicks sidebar links */}
+      {blocker.state === "blocked" && (
+        <div className="quiz-modal-overlay">
+          <div className="quiz-modal-box">
+            <h3>Leave Quiz?</h3>
+            <p>
+              You have an active quiz in progress.
+              <br /><br />
+              ⚠️ The timer will keep running if you leave.
+              <br />
+              You can come back and resume — your answers are saved.
+            </p>
+            <div className="quiz-modal-actions">
+              <button
+                className="quiz-btn-cancel"
+                onClick={() => blocker.reset()}
+              >
+                Stay in Quiz
+              </button>
+              <button
+                className="quiz-btn-exit"
+                onClick={() => blocker.proceed()}
+              >
+                Leave Anyway
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* EXIT MODAL */}
       {showExitModal && (
