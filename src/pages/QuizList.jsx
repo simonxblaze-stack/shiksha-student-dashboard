@@ -49,10 +49,11 @@ export default function QuizList() {
         const completed = [];
 
         res.data.forEach((quiz) => {
+          // All quizzes are always attemptable (no due date), so ALL go in pending.
+          // Completed tab = quizzes that have at least one submission (for review).
+          pending.push(quiz);
           if (quiz.status === "SUBMITTED") {
             completed.push(quiz);
-          } else {
-            pending.push(quiz);
           }
         });
 
@@ -83,6 +84,7 @@ export default function QuizList() {
       setSelectedQuiz(quiz);
       setShowModal(true);
     } else {
+      // Completed tab — go to attempts list where they can review or re-attempt
       navigate(`/subjects/quiz/${subjectId}/attempts/${quiz.id}`);
     }
   };
