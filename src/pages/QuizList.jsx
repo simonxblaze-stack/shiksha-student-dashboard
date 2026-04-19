@@ -62,12 +62,16 @@ export default function QuizList() {
 
   const handleQuizClick = (quiz) => {
     if (activeTab === "pending") {
-      // Show start confirmation modal
+      // If a start time already exists the student is mid-attempt — skip modal
+      const alreadyStarted = !!localStorage.getItem(`quiz_${quiz.id}_start`);
+      if (alreadyStarted) {
+        navigate(`/subjects/quiz/${subjectId}/take/${quiz.id}`);
+        return;
+      }
+      // Fresh start — show confirmation modal
       setSelectedQuiz(quiz);
       setShowModal(true);
     } else {
-      // Completed: go to attempts list (student can pick which attempt to review,
-      // or re-attempt from there)
       navigate(`/subjects/quiz/${subjectId}/attempts/${quiz.id}`);
     }
   };
