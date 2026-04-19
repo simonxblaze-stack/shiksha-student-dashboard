@@ -49,9 +49,9 @@ export default function QuizList() {
         const completed = [];
 
         res.data.forEach((quiz) => {
-          // All quizzes are always attemptable (no due date), so ALL go in pending.
-          // Completed tab = quizzes that have at least one submission (for review).
+          // Always show in pending — students can always re-attempt
           pending.push(quiz);
+          // Also show in completed if they have a submission to review
           if (quiz.status === "SUBMITTED") {
             completed.push(quiz);
           }
@@ -73,20 +73,21 @@ export default function QuizList() {
   const quizzes = activeTab === "pending" ? pendingQuizzes : completedQuizzes;
 
   const handleQuizClick = (quiz) => {
-    if (activeTab === "pending") {
-      // If a start time already exists the student is mid-attempt — skip modal
-      const alreadyStarted = !!localStorage.getItem(`quiz_${quiz.id}_start`);
-      if (alreadyStarted) {
-        navigate(`/subjects/quiz/${subjectId}/take/${quiz.id}`);
-        return;
-      }
-      // Fresh start — show confirmation modal
-      setSelectedQuiz(quiz);
-      setShowModal(true);
-    } else {
-      // Completed tab — go to attempts list where they can review or re-attempt
+    if (activeTab === "completed") {
+      // Review past attempts or re-attempt from the attempts page
       navigate(`/subjects/quiz/${subjectId}/attempts/${quiz.id}`);
+      return;
     }
+    // Pending tab
+    const alreadyStarted = !!localStorage.getItem(`quiz_${quiz.id}_start`);
+    if (alreadyStarted) {
+      // Resume in-progress attempt — skip modal
+      navigate(`/subjects/quiz/${subjectId}/take/${quiz.id}`);
+      return;
+    }
+    // Fresh start or re-attempt — show confirmation modal
+    setSelectedQuiz(quiz);
+    setShowModal(true);
   };
 
   const confirmStartQuiz = () => {

@@ -379,6 +379,8 @@ export default function QuizDetail() {
   };
 
   const handleExitQuiz = () => {
+    // Mark as submitted so the pushState monkey-patch doesn't intercept navigate()
+    submittedRef.current = true;
     localStorage.removeItem(`quiz_${quizId}_start`);
     navigate(`/subjects/quiz/${subjectId}`);
   };
