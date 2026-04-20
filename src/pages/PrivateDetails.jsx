@@ -1,198 +1,243 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/apiClient";
-import { getPrivateDetails, getPublicProfile } from "../utils/profileStorage";
-import "../styles/privateDetails.css";
+import "../styles/private-details.css";
+
+const GENDER_OPTIONS = ["male", "female", "other"];
+const STUDYING_OPTIONS = [
+  { value: "yes", label: "Yes" },
+  { value: "no", label: "No" },
+];
+const CLASS_OPTIONS = ["8", "9", "10", "11", "12"];
+const STREAM_OPTIONS = ["science", "commerce", "arts"];
+const BOARD_OPTIONS = [
+  { value: "cbse", label: "CBSE" },
+  { value: "icse", label: "ICSE" },
+  { value: "mbse", label: "Mizoram Board of School Education" },
+  { value: "nios", label: "NIOS" },
+  { value: "other", label: "Other State Board" },
+];
+const HIGHEST_EDU_OPTIONS = [
+  { value: "below_8", label: "Below Class 8" },
+  { value: "8", label: "Class 8" },
+  { value: "9", label: "Class 9" },
+  { value: "10", label: "Class 10" },
+  { value: "11", label: "Class 11" },
+  { value: "12", label: "Class 12" },
+];
+
+function formatDob(dob) {
+  if (!dob) return "";
+  const d = new Date(dob);
+  if (isNaN(d.getTime())) return dob;
+  const day = String(d.getUTCDate()).padStart(2, "0");
+  const month = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const year = d.getUTCFullYear();
+  return `${day}/${month}/${year}`;
+}
 
 export default function PrivateDetails() {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
 
-  const _priv = getPrivateDetails();
-  const _pub  = getPublicProfile();
-
-  const [avatar, setAvatar] = useState(null);
-  const [avatarType, setAvatarType] = useState(null);
-  const [username, setUsername] = useState(_pub.name || "");
-  const [languages, setLanguages] = useState(_pub.languages ?? ["English", "Mizo"]);
-
-  // Basic Details
-  const [studentId, setStudentId] = useState("");
-  const [firstName, setFirstName] = useState(_priv.firstName ?? "");
-  const [lastName, setLastName] = useState(_priv.lastName ?? "");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState(_priv.phone ?? "");
-  const [dob, setDob] = useState(_priv.dob ?? "");
-  const [gender, setGender] = useState(_priv.gender ?? "");
-
-  // Address
-  const [state, setState] = useState(_priv.state ?? "");
-  const [district, setDistrict] = useState(_priv.district ?? "");
-  const [city, setCity] = useState(_priv.city ?? "");
-  const [pinCode, setPinCode] = useState(_priv.pinCode ?? "");
-
-  // Parent Information
-  const [fatherName, setFatherName] = useState(_priv.fatherName ?? "");
-  const [fatherPhone, setFatherPhone] = useState(_priv.fatherPhone ?? "");
-  const [motherName, setMotherName] = useState(_priv.motherName ?? "");
-  const [motherPhone, setMotherPhone] = useState(_priv.motherPhone ?? "");
-  const [guardianName, setGuardianName] = useState(_priv.guardianName ?? "");
-  const [guardianPhone, setGuardianPhone] = useState(_priv.guardianPhone ?? "");
-  const [parentEmail, setParentEmail] = useState(_priv.parentEmail ?? "");
-
-  // Academic Information
-  const [board, setBoard] = useState(_priv.board ?? "");
-  const [schoolName, setSchoolName] = useState(_priv.schoolName ?? "");
-  const [className, setClassName] = useState(_priv.className ?? "");
-  const [academicYear, setAcademicYear] = useState(_priv.academicYear ?? "");
+  const [form, setForm] = useState({});
 
   useEffect(() => {
-    const priv = getPrivateDetails();
-    const pub  = getPublicProfile();
-    api.get("/accounts/me/")
+    api
+      .get("/accounts/student/profile/")
       .then((res) => {
-        const d = res.data;
-        const p = d.profile || {};
-
-        // API-owned fields
-        setAvatar(p.avatar);
-        setAvatarType(p.avatar_type);
-        setStudentId(p.student_id || "");
-        setEmail(d.email || "");
-        setUsername(pub.name || p.full_name || d.username || "");
-        setLanguages(pub.languages ?? p.languages ?? ["English", "Mizo"]);
-
-        // User-editable fields: localStorage wins, API as fallback if never saved
-        setFirstName(priv.firstName  ?? d.first_name  ?? p.first_name  ?? "");
-        setLastName (priv.lastName   ?? d.last_name   ?? p.last_name   ?? "");
-        setPhone    (priv.phone      ?? p.phone       ?? "");
-        setDob      (priv.dob        ?? p.date_of_birth ?? "");
-        setGender   (priv.gender     ?? p.gender      ?? "");
-        setState    (priv.state      ?? p.state       ?? "");
-        setDistrict (priv.district   ?? p.district    ?? "");
-        setCity     (priv.city       ?? p.city        ?? "");
-        setPinCode  (priv.pinCode    ?? p.pin_code    ?? "");
-        setFatherName   (priv.fatherName    ?? p.father_name   ?? "");
-        setFatherPhone  (priv.fatherPhone   ?? p.father_phone  ?? "");
-        setMotherName   (priv.motherName    ?? p.mother_name   ?? "");
-        setMotherPhone  (priv.motherPhone   ?? p.mother_phone  ?? "");
-        setGuardianName (priv.guardianName  ?? p.guardian_name ?? "");
-        setGuardianPhone(priv.guardianPhone ?? p.guardian_phone ?? "");
-        setParentEmail  (priv.parentEmail   ?? p.parent_email  ?? "");
-        setBoard       (priv.board        ?? p.board         ?? "");
-        setSchoolName  (priv.schoolName   ?? p.school_name   ?? "");
-        setClassName   (priv.className    ?? p.class_name    ?? "");
-        setAcademicYear(priv.academicYear ?? p.academic_year ?? "");
+        setProfile(res.data);
+        setForm(res.data);
       })
-      .catch((err) => console.error("Failed to load profile", err));
+      .catch((err) => setError(err?.response?.data?.detail || "Failed to load profile"))
+      .finally(() => setLoading(false));
   }, []);
 
-  const val = (v) => v || null;
+  const set = (key) => (e) =>
+    setForm((prev) => ({ ...prev, [key]: e.target.value }));
 
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const payload = {};
+      const editableFields = [
+        "first_name", "last_name", "phone", "gender", "date_of_birth",
+        "state", "district", "city_town", "pin_code",
+        "father_name", "father_phone",
+        "mother_name", "mother_phone",
+        "guardian_name", "guardian_phone", "parent_guardian_email",
+        "currently_studying", "current_class", "stream", "board", "board_other",
+        "school_name", "academic_year",
+        "highest_education", "reason_not_studying",
+      ];
+      for (const k of editableFields) {
+        if (form[k] !== undefined) payload[k] = form[k] ?? "";
+      }
+      const res = await api.patch("/accounts/student/profile/", payload);
+      setProfile(res.data);
+      setForm(res.data);
+      setIsEditing(false);
+    } catch (err) {
+      alert(err?.response?.data?.detail || "Save failed");
+    } finally {
+      setSaving(false);
+    }
+  };
 
-  return (
-    <div className="pd">
-      <div className="pd__container">
+  const handleCancel = () => {
+    setForm(profile);
+    setIsEditing(false);
+  };
 
-        {/* ── Header ── */}
-        <div className="pd__header">
-          <div className="pd__headerLeft">
-            <div className="pd__avatar">
-              {avatar ? (
-                avatarType === "emoji"
-                  ? <span className="pd__avatarEmoji">{avatar}</span>
-                  : <img src={avatar} alt={username} />
-              ) : (
-                <span className="pd__avatarFallback">{username?.[0] || "?"}</span>
-              )}
-            </div>
-            <div className="pd__headerInfo">
-              <h2 className="pd__username">{username}</h2>
-              <div className="pd__badges">
-                <span className="pd__badge pd__badge--online">
-                  <span className="pd__badgeDot" />
-                  Online
-                </span>
-                <span className="pd__badge pd__badge--lang">
-                  {languages.join(" & ")}
-                </span>
-              </div>
-            </div>
-          </div>
-          <div className="pd__headerActions">
-            <button className="pd__btn" onClick={() => navigate("/profile")}>Back</button>
-            <button className="pd__btn" onClick={() => navigate("/profile/private-details/edit")}>Edit Profile</button>
-          </div>
-        </div>
+  if (loading) return <div className="pd-loading">Loading...</div>;
+  if (error) return <div className="pd-error">{error}</div>;
+  if (!profile) return null;
 
-        <hr className="pd__divider" />
-
-        {/* ── Basic Details ── */}
-        <div className="pd__body">
-
-          <section className="pd__section">
-            <h3 className="pd__sectionTitle">Basic Details</h3>
-            <div className="pd__grid">
-              <Field label="Username" value={val(username)} />
-              <Field label="Student ID" value={val(studentId)} />
-              <Field label="First Name" value={val(firstName)} />
-              <Field label="Last Name" value={val(lastName)} />
-              <Field label="Email" value={val(email)} />
-              <Field label="Phone Number" value={val(phone)} />
-              <Field label="Date of Birth" value={val(dob)} />
-              <Field label="Gender" value={val(gender)} />
-            </div>
-          </section>
-
-          {/* ── Address ── */}
-          <section className="pd__section">
-            <h3 className="pd__sectionTitle">Address</h3>
-            <div className="pd__grid">
-              <Field label="State" value={val(state)} />
-              <Field label="District" value={val(district)} />
-              <Field label="City" value={val(city)} />
-              <Field label="Pin Code" value={val(pinCode)} />
-            </div>
-          </section>
-
-          {/* ── Parent Information ── */}
-          <section className="pd__section">
-            <h3 className="pd__sectionTitle">Parent Information</h3>
-            <div className="pd__grid">
-              <Field label="Father's Name" value={val(fatherName)} />
-              <Field label="Father's Phone" value={val(fatherPhone)} />
-              <Field label="Mother's Name" value={val(motherName)} />
-              <Field label="Mother's Phone" value={val(motherPhone)} />
-              <Field label="Guardian's Name" value={val(guardianName)} />
-              <Field label="Guardian's Phone" value={val(guardianPhone)} />
-              <Field label="Parent/Guardian Email" value={val(parentEmail)} fullWidth />
-            </div>
-          </section>
-
-          {/* ── Academic Information ── */}
-          <section className="pd__section">
-            <h3 className="pd__sectionTitle">Academic Information</h3>
-            <div className="pd__grid">
-              <Field label="Board" value={val(board)} fullWidth />
-              <Field label="School name" value={val(schoolName)} />
-              <Field label="Class" value={val(className)} />
-              <Field label="Academic Year" value={val(academicYear)} />
-            </div>
-          </section>
-
-        </div>
-      </div>
+  const Field = ({ label, value, editNode }) => (
+    <div className="pd-field">
+      <div className="pd-label">{label}</div>
+      {isEditing && editNode ? editNode : (
+        <div className={`pd-value ${!value ? "pd-value--muted" : ""}`}>{value || "—"}</div>
+      )}
     </div>
   );
-}
 
-function Field({ label, value, fullWidth = false }) {
   return (
-    <div className={`pd__field${fullWidth ? " pd__field--full" : ""}`}>
-      <span className="pd__fieldLabel">{label}</span>
-      <span className={`pd__fieldValue${!value ? " pd__fieldValue--empty" : ""}`}>
-        {value || "Not entered"}
-      </span>
+    <div className="pd-page">
+      <div className="pd-header">
+        <button className="pd-back" onClick={() => navigate(-1)}>← Back</button>
+        <h1>Private Details</h1>
+        {!isEditing ? (
+          <button className="pd-edit-btn" onClick={() => setIsEditing(true)}>Edit</button>
+        ) : (
+          <div className="pd-actions">
+            <button className="pd-cancel-btn" onClick={handleCancel} disabled={saving}>Cancel</button>
+            <button className="pd-save-btn" onClick={handleSave} disabled={saving}>
+              {saving ? "Saving..." : "Save"}
+            </button>
+          </div>
+        )}
+      </div>
+
+      <section className="pd-section">
+        <h2>Basic Details</h2>
+        <div className="pd-grid">
+          <Field label="First Name" value={profile.first_name}
+            editNode={<input className="pd-input" value={form.first_name || ""} onChange={set("first_name")} />} />
+          <Field label="Last Name" value={profile.last_name}
+            editNode={<input className="pd-input" value={form.last_name || ""} onChange={set("last_name")} />} />
+          <Field label="Email" value={profile.email} />
+          <Field label="Phone" value={profile.phone}
+            editNode={<input className="pd-input" value={form.phone || ""} onChange={set("phone")} />} />
+          <Field label="Date of Birth" value={formatDob(profile.date_of_birth)}
+            editNode={<input type="date" className="pd-input" value={form.date_of_birth || ""} onChange={set("date_of_birth")} />} />
+          <Field label="Gender" value={profile.gender}
+            editNode={
+              <select className="pd-input" value={form.gender || ""} onChange={set("gender")}>
+                <option value="">Select</option>
+                {GENDER_OPTIONS.map((g) => <option key={g} value={g}>{g}</option>)}
+              </select>
+            } />
+          <Field label="Student ID" value={profile.student_id} />
+        </div>
+      </section>
+
+      <section className="pd-section">
+        <h2>Address</h2>
+        <div className="pd-grid">
+          <Field label="State" value={profile.state}
+            editNode={<input className="pd-input" value={form.state || ""} onChange={set("state")} />} />
+          <Field label="District" value={profile.district}
+            editNode={<input className="pd-input" value={form.district || ""} onChange={set("district")} />} />
+          <Field label="City/Town" value={profile.city_town}
+            editNode={<input className="pd-input" value={form.city_town || ""} onChange={set("city_town")} />} />
+          <Field label="Pin Code" value={profile.pin_code}
+            editNode={<input className="pd-input" value={form.pin_code || ""} onChange={set("pin_code")} />} />
+        </div>
+      </section>
+
+      <section className="pd-section">
+        <h2>Parent / Guardian</h2>
+        <div className="pd-grid">
+          <Field label="Father's Name" value={profile.father_name}
+            editNode={<input className="pd-input" value={form.father_name || ""} onChange={set("father_name")} />} />
+          <Field label="Father's Phone" value={profile.father_phone}
+            editNode={<input className="pd-input" value={form.father_phone || ""} onChange={set("father_phone")} />} />
+          <Field label="Mother's Name" value={profile.mother_name}
+            editNode={<input className="pd-input" value={form.mother_name || ""} onChange={set("mother_name")} />} />
+          <Field label="Mother's Phone" value={profile.mother_phone}
+            editNode={<input className="pd-input" value={form.mother_phone || ""} onChange={set("mother_phone")} />} />
+          <Field label="Guardian's Name" value={profile.guardian_name}
+            editNode={<input className="pd-input" value={form.guardian_name || ""} onChange={set("guardian_name")} />} />
+          <Field label="Guardian's Phone" value={profile.guardian_phone}
+            editNode={<input className="pd-input" value={form.guardian_phone || ""} onChange={set("guardian_phone")} />} />
+          <Field label="Parent/Guardian Email" value={profile.parent_guardian_email}
+            editNode={<input type="email" className="pd-input" value={form.parent_guardian_email || ""} onChange={set("parent_guardian_email")} />} />
+        </div>
+      </section>
+
+      <section className="pd-section">
+        <h2>Academic Information</h2>
+        <div className="pd-grid">
+          <Field label="Currently Studying" value={profile.currently_studying}
+            editNode={
+              <select className="pd-input" value={form.currently_studying || ""} onChange={set("currently_studying")}>
+                <option value="">Select</option>
+                {STUDYING_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+            } />
+          {(form.currently_studying || profile.currently_studying) === "yes" && (
+            <>
+              <Field label="Current Class" value={profile.current_class}
+                editNode={
+                  <select className="pd-input" value={form.current_class || ""} onChange={set("current_class")}>
+                    <option value="">Select</option>
+                    {CLASS_OPTIONS.map((c) => <option key={c} value={c}>Class {c}</option>)}
+                  </select>
+                } />
+              <Field label="Stream" value={profile.stream}
+                editNode={
+                  <select className="pd-input" value={form.stream || ""} onChange={set("stream")}>
+                    <option value="">Select</option>
+                    {STREAM_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                } />
+              <Field label="Board" value={profile.board}
+                editNode={
+                  <select className="pd-input" value={form.board || ""} onChange={set("board")}>
+                    <option value="">Select</option>
+                    {BOARD_OPTIONS.map((b) => <option key={b.value} value={b.value}>{b.label}</option>)}
+                  </select>
+                } />
+              {(form.board || profile.board) === "other" && (
+                <Field label="Board (Other)" value={profile.board_other}
+                  editNode={<input className="pd-input" value={form.board_other || ""} onChange={set("board_other")} />} />
+              )}
+              <Field label="School Name" value={profile.school_name}
+                editNode={<input className="pd-input" value={form.school_name || ""} onChange={set("school_name")} />} />
+              <Field label="Academic Year" value={profile.academic_year}
+                editNode={<input className="pd-input" value={form.academic_year || ""} onChange={set("academic_year")} />} />
+            </>
+          )}
+          {(form.currently_studying || profile.currently_studying) === "no" && (
+            <>
+              <Field label="Highest Education" value={profile.highest_education}
+                editNode={
+                  <select className="pd-input" value={form.highest_education || ""} onChange={set("highest_education")}>
+                    <option value="">Select</option>
+                    {HIGHEST_EDU_OPTIONS.map((e) => <option key={e.value} value={e.value}>{e.label}</option>)}
+                  </select>
+                } />
+              <Field label="Reason for not studying" value={profile.reason_not_studying}
+                editNode={<input className="pd-input" value={form.reason_not_studying || ""} onChange={set("reason_not_studying")} />} />
+            </>
+          )}
+        </div>
+      </section>
     </div>
   );
 }

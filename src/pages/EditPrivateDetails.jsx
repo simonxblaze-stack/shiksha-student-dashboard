@@ -51,23 +51,21 @@ export default function EditPrivateDetails() {
   useEffect(() => {
     const priv = getPrivateDetails();
     const pub  = getPublicProfile();
-    api.get("/accounts/me/")
+    api.get("/accounts/student/profile/")
       .then((res) => {
-        const d = res.data;
-        const p = d.profile || {};
-        setAvatar(p.avatar);
-        setAvatarType(p.avatar_type);
-        setUsername(pub.name || p.full_name || d.username || "");
+        const p = res.data;
+        setAvatar(p.photo);
+        setUsername(pub.name || p.name || "");
         setStudentId(p.student_id || "");
-        setFirstName(priv.firstName  ?? d.first_name  ?? p.first_name  ?? "");
-        setLastName (priv.lastName   ?? d.last_name   ?? p.last_name   ?? "");
-        setEmail    (d.email || "");
+        setFirstName(priv.firstName  ?? p.first_name  ?? "");
+        setLastName (priv.lastName   ?? p.last_name   ?? "");
+        setEmail    (p.email || "");
         setPhone    (priv.phone      ?? p.phone       ?? "");
         setDob      (priv.dob        ?? p.date_of_birth ?? "");
         setGender   (priv.gender     ?? p.gender      ?? "");
         setState    (priv.state      ?? p.state       ?? "");
         setDistrict (priv.district   ?? p.district    ?? "");
-        setCity     (priv.city       ?? p.city        ?? "");
+        setCity     (priv.city       ?? p.city_town   ?? "");
         setPinCode  (priv.pinCode    ?? p.pin_code    ?? "");
         setFatherName   (priv.fatherName    ?? p.father_name   ?? "");
         setFatherPhone  (priv.fatherPhone   ?? p.father_phone  ?? "");
@@ -75,12 +73,12 @@ export default function EditPrivateDetails() {
         setMotherPhone  (priv.motherPhone   ?? p.mother_phone  ?? "");
         setGuardianName (priv.guardianName  ?? p.guardian_name ?? "");
         setGuardianPhone(priv.guardianPhone ?? p.guardian_phone?? "");
-        setParentEmail  (priv.parentEmail   ?? p.parent_email  ?? "");
-        setBoard       (priv.board        ?? p.board        ?? "");
-        setSchoolName  (priv.schoolName   ?? p.school_name  ?? "");
-        setClassName   (priv.className    ?? p.class_name   ?? "");
-        setAcademicYear(priv.academicYear ?? p.academic_year ?? "");
-        setLanguages(pub.languages ?? p.languages ?? ["English", "Mizo"]);
+        setParentEmail  (priv.parentEmail   ?? p.parent_guardian_email  ?? "");
+        setBoard       (priv.board        ?? p.board          ?? "");
+        setSchoolName  (priv.schoolName   ?? p.school_name    ?? "");
+        setClassName   (priv.className    ?? p.current_class  ?? "");
+        setAcademicYear(priv.academicYear ?? p.academic_year  ?? "");
+        setLanguages(pub.languages ?? ["English", "Mizo"]);
       })
       .catch((err) => console.error("Failed to load profile", err));
   }, []);
@@ -95,30 +93,29 @@ export default function EditPrivateDetails() {
       board, schoolName, className, academicYear,
     });
     try {
-      await api.patch("/accounts/me/", {
+      const payload = {
         first_name: firstName,
         last_name: lastName,
-        profile: {
-          phone,
-          date_of_birth: dob,
-          gender,
-          state,
-          district,
-          city,
-          pin_code: pinCode,
-          father_name: fatherName,
-          father_phone: fatherPhone,
-          mother_name: motherName,
-          mother_phone: motherPhone,
-          guardian_name: guardianName,
-          guardian_phone: guardianPhone,
-          parent_email: parentEmail,
-          board,
-          school_name: schoolName,
-          class_name: className,
-          academic_year: academicYear,
-        },
-      });
+        phone,
+        gender,
+        state,
+        district,
+        city_town: city,
+        pin_code: pinCode,
+        father_name: fatherName,
+        father_phone: fatherPhone,
+        mother_name: motherName,
+        mother_phone: motherPhone,
+        guardian_name: guardianName,
+        guardian_phone: guardianPhone,
+        parent_guardian_email: parentEmail,
+        board,
+        school_name: schoolName,
+        current_class: className,
+        academic_year: academicYear,
+      };
+      if (dob) payload.date_of_birth = dob;
+      await api.patch("/accounts/student/profile/", payload);
     } catch (err) {
       console.error("Save failed", err);
     } finally {
