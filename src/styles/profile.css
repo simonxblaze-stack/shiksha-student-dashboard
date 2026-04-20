@@ -196,6 +196,25 @@
   background: transparent;
 }
 
+.profileBadge--class {
+  background: #e8f4fd;
+  color: #1565a8;
+  border: 1.5px solid #1565a8;
+}
+
+.profileBadge--board {
+  background: #fdf3e8;
+  color: #a85c15;
+  border: 1.5px solid #a85c15;
+}
+
+.profileBadge--id {
+  background: #f0f0f0;
+  color: #444;
+  border: 1.5px solid #999;
+  font-family: monospace;
+}
+
 /* Header actions */
 .profileHeader__actions {
   display: flex;
