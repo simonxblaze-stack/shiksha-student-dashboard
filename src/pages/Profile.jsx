@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../api/apiClient";
 import "../styles/profile.css";
 
 export default function Profile() {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [avatar, setAvatar] = useState(null);
   const [avatarType, setAvatarType] = useState(null);
@@ -264,7 +266,12 @@ export default function Profile() {
             <button className="profileCard__editSaveBtn" onClick={handleEditSave}>Save</button>
           </div>
         ) : (
-          <button className="profileCard__editBtn" onClick={handleEditClick}>EDIT</button>
+          <div className="profileCard__editActions">
+            <button className="profileCard__editBtn" onClick={handleEditClick}>EDIT</button>
+            <button className="profileCard__editBtn" onClick={() => navigate("/private-details")}>
+              VIEW PRIVATE DETAILS
+            </button>
+          </div>
         )}
       </div>
 

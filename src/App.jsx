@@ -7,6 +7,7 @@ import StudentLayout from "./layout/StudentLayout";
 
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
+import PrivateDetails from "./pages/PrivateDetails";
 import ChangePassword from "./pages/ChangePassword";
 
 import Subjects from "./pages/Subjects";
@@ -56,6 +57,7 @@ export default function App() {
               <Route index element={<Dashboard />} />
 
               <Route path="profile" element={<Profile />} />
+              <Route path="private-details" element={<PrivateDetails />} />
               <Route path="change-password" element={<ChangePassword />} />
 
               <Route path="subjects" element={<Subjects />} />
