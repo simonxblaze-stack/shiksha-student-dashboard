@@ -83,23 +83,22 @@ export default function EditProfile() {
         await api.patch("/accounts/me/", { profile: { avatar_emoji: tempAvatar } });
         setAvatar(tempAvatar);
         setAvatarType("emoji");
-      }
-      if (tempAvatarType === "image" && tempAvatarFile) {
+      } else if (tempAvatarType === "image" && tempAvatarFile) {
         const formData = new FormData();
         formData.append("avatar_image", tempAvatarFile);
-        await api.patch("/accounts/me/", formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-        setAvatar(URL.createObjectURL(tempAvatarFile));
+        // Do NOT set Content-Type manually — axios derives it with the correct boundary from FormData
+        const res = await api.patch("/accounts/me/", formData);
+        const saved = res.data?.profile;
+        setAvatar(saved?.avatar ?? URL.createObjectURL(tempAvatarFile));
         setAvatarType("image");
       }
-    } catch (err) {
-      console.error("Avatar update failed", err);
-    } finally {
       setShowPicker(false);
       setTempAvatar(null);
       setTempAvatarType(null);
       setTempAvatarFile(null);
+    } catch (err) {
+      console.error("Avatar update failed", err);
+      alert("Failed to save avatar. Please try again.");
     }
   };
 
