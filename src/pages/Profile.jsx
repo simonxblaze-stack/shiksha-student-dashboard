@@ -1,28 +1,57 @@
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
+import api from "../api/apiClient";
 import { getPublicProfile } from "../utils/profileStorage";
 import "../styles/profile.css";
 
 export default function Profile() {
   const navigate = useNavigate();
-  const { user, loading } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [avatar, setAvatar] = useState(null);
+  const [avatarType, setAvatarType] = useState(null);
 
-  const stored = getPublicProfile();
-  const p = user?.profile || {};
+  const _stored = getPublicProfile();
+  const [studentInfo, setStudentInfo] = useState({
+    name: _stored.name || "",
+    className: "Class 12 - Science",
+    board: "CBSE",
+    studentId: "",
+    email: "",
+    phone: "",
+  });
 
-  const studentInfo = {
-    name: stored.name || p.full_name || "",
-    className: p.class_name || "",
-    board: p.board || "",
-    studentId: p.student_id || "",
+  const [about, setAbout] = useState(_stored.about ?? "");
+  const [subjects, setSubjects] = useState(_stored.subjects ?? []);
+  const [hobbies, setHobbies] = useState(_stored.hobbies ?? []);
+  const [languages, setLanguages] = useState(_stored.languages ?? []);
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  const fetchProfile = async () => {
+    try {
+      const res = await api.get("/accounts/me/");
+      const data = res.data;
+      const p = data.profile || {};
+      const stored = getPublicProfile();
+      setStudentInfo({
+        name: stored.name || p.full_name || "",
+        email: data.email || "",
+        studentId: p.student_id || "",
+        phone: p.phone || "",
+        className: p.class_name || "Class 12 - Science",
+        board: p.board || "CBSE",
+      });
+      setAvatar(p.avatar);
+      setAvatarType(p.avatar_type);
+    } catch (err) {
+      console.error("Failed to load profile", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const avatar = p.avatar || null;
-  const avatarType = p.avatar_type || null;
-  const about = stored.about ?? "";
-  const subjects = stored.subjects ?? [];
-  const hobbies = stored.hobbies ?? [];
-  const languages = stored.languages ?? [];
 
   if (loading) return <div className="profileLoading">Loading...</div>;
 
@@ -51,23 +80,19 @@ export default function Profile() {
 
             {/* Name & meta */}
             <div className="profileHeader__info">
-              <h2 className="profileHeader__name">{studentInfo.name}</h2>
+              <h2 className="profileHeader__name">{studentInfo?.name}</h2>
+              <div className="profileHeader__metaRow">
+                <span>• {studentInfo?.className}</span>
+              </div>
+              <div className="profileHeader__metaRow">
+                <span>• {studentInfo?.board}</span>
+              </div>
+              {studentInfo?.studentId && (
+                <div className="profileHeader__metaRow">
+                  <span>• {studentInfo.studentId}</span>
+                </div>
+              )}
               <div className="profileHeader__badges">
-                {studentInfo.className && (
-                  <span className="profileBadge profileBadge--class">
-                    {studentInfo.className}
-                  </span>
-                )}
-                {studentInfo.board && (
-                  <span className="profileBadge profileBadge--board">
-                    {studentInfo.board}
-                  </span>
-                )}
-                {studentInfo.studentId && (
-                  <span className="profileBadge profileBadge--id">
-                    ID: {studentInfo.studentId}
-                  </span>
-                )}
                 <span className="profileBadge profileBadge--online">
                   <span className="profileBadge__dot" />
                   Online
