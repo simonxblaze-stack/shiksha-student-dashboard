@@ -32,19 +32,33 @@ export default function Profile() {
 
   const fetchProfile = async () => {
     try {
-      const res = await api.get("/accounts/me/");
-      const data = res.data;
+      const [meRes, spRes] = await Promise.all([
+        api.get("/accounts/me/"),
+        api.get("/accounts/student/profile/"),
+      ]);
+      const me = meRes.data;
+      const sp = spRes.data;
 
       setStudentInfo({
-        name: data.profile.full_name,
-        email: data.email,
-        studentId: data.profile.student_id,
-        phone: data.profile.phone,
+        name: sp.name || me.profile.full_name,
+        email: sp.email || me.email,
+        studentId: sp.student_id || me.profile.student_id,
+        phone: sp.phone || me.profile.phone,
+        gender: sp.gender,
+        dateOfBirth: sp.date_of_birth,
+        state: sp.state,
+        district: sp.district,
+        city: sp.city_town,
+        pinCode: sp.pin_code,
+        currentClass: sp.current_class,
+        stream: sp.stream,
+        board: sp.board,
+        schoolName: sp.school_name,
       });
 
-      setAvatar(data.profile.avatar);
-      setAvatarType(data.profile.avatar_type);
-      setCourses(data.enrollments || []);
+      setAvatar(sp.photo || me.profile.avatar);
+      setAvatarType(me.profile.avatar_type);
+      setCourses(me.enrollments || []);
     } catch (err) {
       console.error("Failed to load profile", err);
     } finally {
@@ -255,6 +269,47 @@ export default function Profile() {
                   <span className="profileCard__icon">✆</span>
                   <span>{studentInfo?.phone}</span>
                 </div>
+                {studentInfo?.gender && (
+                  <div className="profileCard__detail">
+                    <span className="profileCard__icon">⚥</span>
+                    <span>{studentInfo.gender}</span>
+                  </div>
+                )}
+                {studentInfo?.dateOfBirth && (
+                  <div className="profileCard__detail">
+                    <span className="profileCard__icon">🎂</span>
+                    <span>{studentInfo.dateOfBirth}</span>
+                  </div>
+                )}
+                {(studentInfo?.city || studentInfo?.district || studentInfo?.state) && (
+                  <div className="profileCard__detail">
+                    <span className="profileCard__icon">📍</span>
+                    <span>
+                      {[studentInfo.city, studentInfo.district, studentInfo.state]
+                        .filter(Boolean)
+                        .join(", ")}
+                      {studentInfo.pinCode ? ` - ${studentInfo.pinCode}` : ""}
+                    </span>
+                  </div>
+                )}
+                {studentInfo?.schoolName && (
+                  <div className="profileCard__detail">
+                    <span className="profileCard__icon">🏫</span>
+                    <span>{studentInfo.schoolName}</span>
+                  </div>
+                )}
+                {(studentInfo?.currentClass || studentInfo?.stream || studentInfo?.board) && (
+                  <div className="profileCard__detail">
+                    <span className="profileCard__icon">📚</span>
+                    <span>
+                      {[
+                        studentInfo.currentClass && `Class ${studentInfo.currentClass}`,
+                        studentInfo.stream,
+                        studentInfo.board?.toUpperCase(),
+                      ].filter(Boolean).join(" • ")}
+                    </span>
+                  </div>
+                )}
               </>
             )}
           </div>
