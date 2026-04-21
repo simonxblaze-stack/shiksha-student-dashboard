@@ -3,37 +3,39 @@
 .dashExact {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 24px;
-  overflow-y: auto;
-  overflow-x: hidden;
+  gap: 12px;
+  padding: 12px 16px;
+  overflow: hidden;
   box-sizing: border-box;
+  height: calc(100vh - 64px); /* adjust 64px to your header height */
 }
 
 /* Sessions + Calendar */
 .dashExact__top {
   display: grid;
   grid-template-columns: 2.2fr 1fr;
-  gap: 16px;
+  gap: 12px;
   align-items: stretch;
+  flex-shrink: 0;
 }
 
 /* Assignment+Quiz | Notification | Schedule */
 .dashExact__bottom {
   display: grid;
-  grid-template-columns: 1.2fr 1fr 1fr;
-  gap: 16px;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 12px;
   align-items: stretch;
-  flex: 1;
+  flex: 1 1 0;
   min-height: 0;
+  overflow: hidden;
 }
 
 /* Left stacked column (Assignment + Quiz) */
 .dashExact__leftCol {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  height: 100%;
+  gap: 12px;
+  min-height: 0;
 }
 
 .dashExact__leftCol > .whiteCard {
@@ -46,7 +48,6 @@
 .dashExact__bottom > .whiteCard {
   display: flex;
   flex-direction: column;
-  height: 100%;
   min-height: 0;
 }
 
@@ -55,11 +56,10 @@
 .whiteCard {
   background: #ffffff;
   border-radius: 16px;
-  margin-top: 10px;
-  padding: 16px;
+  padding: 12px 14px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
 }
-
 
 /* ===== CARD HEADER ===== */
 
@@ -67,13 +67,15 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
+  flex-shrink: 0;
 }
 
 .cardHeader h3 {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 800;
   color: #1a1a1a;
+  margin: 0;
 }
 
 .cardHeader--clickable {
@@ -125,62 +127,65 @@
 
 /* ===== SESSION GRID ===== */
 
-.sessionsGrid {
+.sessionsGridCollapsed,
+.sessionsGridExpanded {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  padding-top: 4px;
-  padding-bottom: 4px;
-  flex: 1;
-  min-height: 0;
-  align-items: stretch;
+  padding: 4px 0;
 }
 
-.sessionsGrid::-webkit-scrollbar { display: none; }
+.sessionsGridCollapsed::-webkit-scrollbar,
+.sessionsGridExpanded::-webkit-scrollbar { display: none; }
 
-.sessionsGrid > * {
-  flex: 0 0 calc((100% - 24px) / 3);
-  scroll-snap-align: start;
+.sessionsGridExpanded {
+  flex: 1 1 0;
+  min-height: 0;
+  flex-wrap: wrap;
 }
 
 /* ===== LIST / NOTIFICATION BODY ===== */
 
 .listBody {
-  flex: 1;
+  flex: 1 1 0;
   overflow-y: auto;
   min-height: 0;
 }
-.listBody::-webkit-scrollbar { display: none; }
+.listBody::-webkit-scrollbar { width: 4px; }
+.listBody::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
 
 .notifBody {
-  flex: 1;
+  flex: 1 1 0;
   overflow-y: auto;
   min-height: 0;
 }
-.notifBody::-webkit-scrollbar { display: none; }
+.notifBody::-webkit-scrollbar { width: 4px; }
+.notifBody::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
 
 /* ===== CALENDAR ===== */
 
 .calendarBox {
   background: #ffffff;
   border-radius: 16px;
-  margin-top: 10px;
-  padding: 14px;
+  padding: 12px 14px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .calendarHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
+  flex-shrink: 0;
 }
 
 .calNavBtn {
   cursor: pointer;
-  font-size: 18px;
+  font-size: 14px;
   color: #555;
   line-height: 1;
   padding: 2px 6px;
@@ -194,7 +199,7 @@
 
 .calendarHeader__mid {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   align-items: center;
 }
 
@@ -211,59 +216,62 @@
 .calendarGrid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 3px;
-  font-size: 12px;
+  gap: 2px;
 }
 
 .calDayName {
   text-align: center;
   font-weight: 700;
   opacity: 0.6;
-  font-size: 11px;
-  padding: 4px 0;
+  font-size: 10px;
+  padding: 3px 0;
 }
 
+/* ── Calendar date cell ──
+   KEY FIX: no aspect-ratio, no border-radius:50%, no overflow:hidden.
+   Cell is a small flex column so the number sits on top and dots sit below. */
 .calDate {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  aspect-ratio: 1;
-  border-radius: 50%;
+  justify-content: flex-start;
+  border-radius: 6px;
   cursor: pointer;
   transition: background 0.15s ease;
   font-size: 11px;
-  overflow: hidden;
-  padding: 2px;
+  padding: 3px 1px;
+  min-height: 30px;
+  line-height: 1.2;
 }
 
 .calDate:hover {
   background: rgba(10, 128, 138, 0.08);
 }
 
-
+/* Today — red rounded rect, not a circle */
 .calToday {
   background: #ff5b5b !important;
   color: white;
   font-weight: 700;
+  border-radius: 6px;
 }
 
 .calToday:hover {
   background: #e53935 !important;
 }
 
+/* Selected — teal border, rounded rect */
 .calSelected {
-  background: rgba(10, 128, 138, 0.15); /* soft teal circle */
+  background: rgba(10, 128, 138, 0.15);
   color: #0a808a;
   font-weight: 700;
   border: 2px solid #0a808a;
+  border-radius: 6px;
 }
-
 
 .calSelected:hover {
   background: rgba(10, 128, 138, 0.18) !important;
 }
-
 
 .calDate.calToday.calSelected {
   background: #ff5b5b !important;
@@ -271,56 +279,44 @@
   color: white;
 }
 
-
+/* ── Event dots — show on ALL days including today ── */
 .calDate__dots {
   display: flex;
   gap: 2px;
   justify-content: center;
   margin-top: 2px;
-  flex-shrink: 0;
+  flex-wrap: wrap;
 }
 
 .calDate__dot {
-  width: 3px;
-  height: 3px;
+  width: 4px;
+  height: 4px;
   border-radius: 50%;
   flex-shrink: 0;
-}
-
-.calRed:hover {
-  background: #086f78 !important;
-}
-
-
-.calDate__dot--livesessions { background: #FDD835; }
-.calDate__dot--assignments  { background: #4CAF50; }
-.calDate__dot--quiz         { background: #9C27B0; }
-
-.calDate.calToday    .calDate__dots,
-.calDate.calSelected .calDate__dots {
-  display: none;
+  display: block;
 }
 
 /* ===== CALENDAR LEGEND ===== */
 .calLegend {
   display: flex;
   justify-content: center;
-  gap: 10px;
-  margin-top: 12px;
+  gap: 8px;
+  margin-top: 6px;
   flex-wrap: wrap;
+  flex-shrink: 0;
 }
 
 .calLegend__item {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 0.82rem;
+  gap: 4px;
+  font-size: 10px;
   color: #5a5a5a;
 }
 
 .calLegend__dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   display: inline-block;
   flex-shrink: 0;
@@ -329,31 +325,30 @@
 /* ===== SCHEDULE LIST ===== */
 
 .scheduleList {
-  flex: 1;
+  flex: 1 1 0;
   overflow-y: auto;
   min-height: 0;
 }
-.scheduleList::-webkit-scrollbar { display: none; }
+.scheduleList::-webkit-scrollbar { width: 4px; }
+.scheduleList::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
 
 .scheduleItem {
   position: relative;
   background: #f8fafb;
   border-radius: 10px;
-  padding: 9px 10px 9px 14px;
+  padding: 8px 10px 8px 14px;
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
   overflow: clip;
-  margin-bottom: 8px;
+  margin-bottom: 7px;
 }
 
 .scheduleItem:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.scheduleItem * {
-  pointer-events: none;
-}
+.scheduleItem * { pointer-events: none; }
 
 .scheduleItem::before {
   content: "";
@@ -379,13 +374,13 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 3px;
+  margin-bottom: 2px;
 }
 
 .scheduleBadge {
   font-size: 9px;
   font-weight: 700;
-  padding: 2px 8px;
+  padding: 2px 7px;
   border-radius: 12px;
   color: #fff;
   white-space: nowrap;
@@ -396,35 +391,30 @@
 .scheduleBadge--quiz            { background: #9C27B0; }
 .scheduleBadge--privatesession  { background: #FF8A65; }
 
-
-.scheduleDayBadge {
-  font-size: 9px;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 20px;
-  background: #4a4a4a;
-  color: #fff;
-  white-space: nowrap;
-  flex-shrink: 0;
-  margin-left: 8px;
-}
-
 .scheduleDate {
   font-size: 10px;
   font-weight: 800;
   color: #555;
+  margin: 0;
 }
 
 .scheduleTitle {
   font-size: 12px;
   font-weight: 800;
   color: #111;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .scheduleSub {
-  font-size: 11px;
+  font-size: 10px;
   color: #555;
-  margin-top: 2px;
+  margin: 1px 0 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .emptyState {
@@ -434,105 +424,190 @@
   padding: 20px 0;
 }
 
+/* ===== NOTIFICATION CARDS ===== */
+
+.notifItem {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  background: #f9fafb;
+  overflow: hidden;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.notifItem:hover { background: #f3f4f6; }
+
+.notifItem--unread { background: #eff6ff; }
+.notifItem--unread:hover { background: #dbeafe; }
+
+.notifItem__bar {
+  width: 3px;
+  align-self: stretch;
+  flex-shrink: 0;
+}
+
+.notifItem--assignments .notifItem__bar  { background: #f59e0b; }
+.notifItem--livesessions .notifItem__bar { background: #ef4444; }
+.notifItem--quiz .notifItem__bar         { background: #8b5cf6; }
+.notifItem--submission .notifItem__bar   { background: #2563eb; }
+
+.notifItem__unreadDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #3b82f6;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  flex-shrink: 0;
+}
+
+.notifItem__content {
+  flex: 1;
+  padding: 7px 10px;
+  min-width: 0;
+}
+
+.notifItem__header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+.notifItem__badge {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 1px 6px;
+  border-radius: 20px;
+}
+.notifItem__badge--assignments  { background: #fef3c7; color: #92400e; }
+.notifItem__badge--livesessions { background: #fee2e2; color: #991b1b; }
+.notifItem__badge--quiz         { background: #ede9fe; color: #4c1d95; }
+.notifItem__badge--submission   { background: #dbeafe; color: #1e3a8a; }
+
+.notifItem__chevron {
+  margin-left: auto;
+  font-size: 9px;
+  color: #9ca3af;
+}
+
+.notifItem__title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.notifItem__sub {
+  font-size: 11px;
+  color: #6b7280;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.notifItem__time {
+  font-size: 10px;
+  color: #9ca3af;
+  margin: 2px 0 0;
+}
+
+.notifItem__expand {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid #e5e7eb;
+  font-size: 11px;
+}
+
+.notifItem__expandRow {
+  display: flex;
+  justify-content: space-between;
+  margin: 3px 0;
+  color: #374151;
+}
+
+.notifItem__expandLabel {
+  color: #9ca3af;
+  margin-right: 8px;
+}
+
+.notifItem__viewBtn {
+  margin-top: 6px;
+  font-size: 11px;
+  color: #0a808a;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-weight: 600;
+}
+
 /* ===== RESPONSIVE ===== */
 
 @media (min-width: 769px) and (max-width: 1100px) {
   .dashExact__top {
     grid-template-columns: 1.4fr 1fr;
-    gap: 12px;
-  }
-
-  .sessionsGrid {
     gap: 10px;
-  }
-
-  .sessionsGrid > * {
-    flex: 0 0 calc((100% - 10px) / 2);
   }
 
   .dashExact__bottom {
     grid-template-columns: 1fr 1fr;
-    height: auto;
-    gap: 12px;
+    gap: 10px;
   }
 
   .dashExact__leftCol {
     grid-column: 1 / -1;
     flex-direction: row;
-    height: 260px;
-  }
-
-  .dashExact__leftCol > .whiteCard {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .dashExact__bottom > .whiteCard {
-    height: 300px;
-  }
-
-  .whiteCard {
-    padding: 11px;
-  }
-
-  .calendarBox {
-    padding: 11px;
   }
 }
 
 @media (min-width: 769px) and (max-width: 908px) {
   .dashExact__top {
     grid-template-columns: 1fr;
-    gap: 12px;
-  }
-
-  .dashExact__top > .whiteCard {
-    height: auto;
-  }
-
-  .sessionsGrid > * {
-    flex: 0 0 calc((100% - 10px) / 2);
   }
 }
 
-.mobileOnly {
-  display: none;
-}
+/* ===== DESKTOP / MOBILE TOGGLE ===== */
+
+.mobileOnly { display: none; }
 
 .desktopOnly {
   display: flex;
   flex-direction: column;
   height: 100%;
   min-height: 0;
-  gap: 16px;
+  gap: 12px;
 }
 
 .mobileSectionContent {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .mobileSectionTopAction {
   display: flex;
   justify-content: flex-end;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
-.mobileCalendarCard {
-  margin-top: 0;
-}
+.mobileCalendarCard { margin-top: 0; }
+
+/* ===== MOBILE ===== */
 
 @media (max-width: 768px) {
-  .desktopOnly {
-    display: none !important;
-  }
+  .desktopOnly { display: none !important; }
 
   .mobileOnly {
     display: block !important;
     width: 100%;
-    height: auto;
-    overflow: visible;
   }
 
   .dashExact {
@@ -544,13 +619,11 @@
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     padding-bottom: 24px;
-    box-sizing: border-box;
   }
 
   .mobileSectionBody {
     width: 100%;
     padding: 2px 0 16px;
-    margin: 0;
   }
 
   .listBody,
@@ -559,5 +632,10 @@
     height: auto;
     max-height: none;
     overflow: visible;
+  }
+
+  .calDate {
+    min-height: 34px;
+    font-size: 12px;
   }
 }
