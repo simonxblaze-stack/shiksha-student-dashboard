@@ -76,22 +76,33 @@ export default function ClassroomUI({ role, sessionId: sessionIdProp, onLeave })
   const pipTrack = screenTrack ? cameraTrack : null;
 
 
-
-  if (!isPresenter && sessionStatus === "PAUSED") {
-    return (
-      <div style={{
-        height: "100vh", display: "flex", alignItems: "center",
-        justifyContent: "center", flexDirection: "column",
-        background: "#0d1117", color: "#e8eaf2", gap: 16,
-      }}>
-        <div style={{ fontSize: 52 }}>&#9208;</div>
-        <h2 style={{ margin: 0, fontWeight: 600 }}>Session paused by teacher</h2>
-        <p style={{ color: "#6b7591", margin: 0, fontSize: 14 }}>
-          Please wait, the session will resume shortly
-        </p>
-      </div>
-    );
-  }
+if (!isPresenter && sessionStatus === "PAUSED") {
+  return (
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        minHeight: "100%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexDirection: "column",
+        background: "#0d1117",
+        color: "#e8eaf2",
+        gap: 16,
+        textAlign: "center",
+        padding: "24px",
+        flex: 1,
+      }}
+    >
+      <div style={{ fontSize: 52, lineHeight: 1 }}>&#9208;</div>
+      <h2 style={{ margin: 0, fontWeight: 600 }}>Session paused by teacher</h2>
+      <p style={{ color: "#6b7591", margin: 0, fontSize: 14 }}>
+        Please wait, the session will resume shortly
+      </p>
+    </div>
+  );
+}
 
   if (!mainTrack) {
     return (
