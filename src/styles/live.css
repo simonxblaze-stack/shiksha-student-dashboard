@@ -665,71 +665,37 @@
   height: 38px;
   cursor: pointer;
 }
-
+/* ===== overlay buttons ===== */
 .video-overlay-actions {
   position: absolute;
-  top: 14px;
-  right: 14px;
-  z-index: 30;
+  top: 10px;
+  right: 10px;
+  z-index: 120;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .ov-btn {
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  border: 1px solid rgba(255,255,255,.15);
-  background: rgba(0,0,0,.6);
+  border: 1px solid rgba(255,255,255,.16);
+  background: rgba(0,0,0,.55);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   backdrop-filter: blur(10px);
-  transition: background .15s, transform .15s;
   padding: 0;
-}
-
-.ov-btn:hover {
-  background: rgba(0,0,0,.78);
-  transform: scale(1.08);
 }
 
 .ov-btn:active {
   transform: scale(0.96);
 }
 
-/* ===== mobile ===== */
-@media (max-width: 900px) {
-  .classroom-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .right-sidebar {
-    position: fixed;
-    right: 12px;
-    top: 60px;
-    width: min(360px, 92vw);
-    height: calc(100vh - 80px);
-    z-index: 50;
-  }
-
-  .control-bar {
-    bottom: 16px;
-    padding: 8px 12px;
-    gap: 8px;
-  }
-
-  .ctrl-btn {
-    padding: 8px 12px;
-    min-width: 54px;
-    font-size: 10px;
-  }
-}
-
-/* ===== better mobile responsiveness ===== */
+/* ===== mobile only ===== */
 @media (max-width: 900px) {
   .studentLayout__page {
     padding: 8px !important;
@@ -739,174 +705,117 @@
     grid-template-columns: 1fr;
     gap: 8px;
     height: 100%;
-  }
-
-  .main-stage {
-    min-height: 220px;
-    border-radius: 14px;
-  }
-
-  .main-stage video {
-    min-height: 220px;
-    object-fit: cover;
-  }
-
-  .pip-camera {
-    width: 110px;
-    height: 74px;
-    right: 10px;
-    bottom: 78px;
-    border-radius: 10px;
-  }
-
-  .right-sidebar {
-    position: fixed;
-    left: 8px;
-    right: 8px;
-    top: 72px;
-    width: auto;
-    height: calc(100vh - 160px);
-    max-height: calc(100vh - 160px);
-    z-index: 60;
-    border-radius: 16px;
-  }
-
-  .right-sidebar > :first-child {
-    max-height: 180px;
-  }
-
-  .chat-panel {
     min-height: 0;
   }
 
-  .chat-messages {
-    padding: 10px;
+  .main-stage {
+    min-height: calc(100vh - 110px);
+    border-radius: 14px;
+    overflow: hidden;
   }
 
-  .chat-input-area {
-    padding: 8px 10px;
-    gap: 6px;
-  }
-
-  .chat-input-area input {
-    min-width: 0;
-    font-size: 14px;
-    padding: 10px 12px;
-  }
-
-  .chat-send-btn {
-    width: 42px;
-    height: 42px;
-    flex-shrink: 0;
-  }
-
-  .control-bar {
-    position: fixed;
-    left: 50%;
-    bottom: 10px;
-    transform: translateX(-50%);
-    width: calc(100vw - 20px);
-    max-width: 360px;
-    justify-content: center;
-    gap: 6px;
-    padding: 8px 10px;
-    border-radius: 18px;
-    z-index: 100;
-  }
-
-  .ctrl-btn {
-    min-width: 0;
-    flex: 1;
-    padding: 8px 6px;
-    font-size: 10px;
-    gap: 2px;
-  }
-
-  .raise-hand-btn {
-    right: 12px;
-    bottom: 82px;
-    width: 52px;
-    height: 52px;
-    font-size: 18px;
-    z-index: 95;
-  }
-
-  .video-overlay-actions {
-    top: 10px;
-    right: 10px;
-    gap: 6px;
-  }
-
-  .ov-btn {
-    width: 36px;
-    height: 36px;
-  }
-}
-
-/* ===== extra small phones ===== */
-@media (max-width: 480px) {
-  .studentLayout__page {
-    padding: 6px !important;
-  }
-
-  .main-stage,
   .main-stage video {
-    min-height: 190px;
+    width: 100%;
+    height: 100%;
+    min-height: calc(100vh - 110px);
+    object-fit: cover;
+    display: block;
   }
 
   .pip-camera {
     width: 96px;
     height: 64px;
     right: 8px;
-    bottom: 74px;
+    bottom: 88px;
+    border-radius: 10px;
   }
 
-  .right-sidebar {
-    top: 64px;
-    left: 6px;
-    right: 6px;
-    height: calc(100vh - 148px);
-    max-height: calc(100vh - 148px);
+  .video-overlay-actions {
+    top: 8px;
+    right: 8px;
+    z-index: 130;
   }
 
-  .right-sidebar > :first-child {
-    max-height: 150px;
-    padding: 10px;
-  }
-
-  .participant-card {
-    padding: 8px;
-  }
-
-  .participant-name {
-    font-size: 12px;
-  }
-
-  .chat-header {
-    padding: 8px 10px;
-    font-size: 11px;
-  }
-
-  .chat-messages {
-    padding: 8px;
-  }
-
-  .chat-bubble {
-    max-width: 88%;
-    padding: 8px 10px;
-  }
-
-  .chat-text {
-    font-size: 12px;
+  .ov-btn {
+    width: 36px;
+    height: 36px;
   }
 
   .chat-input-area {
-    padding: 8px;
+    padding-right: 74px;
   }
 
   .chat-input-area input {
-    font-size: 13px;
+    min-width: 0;
+    font-size: 14px;
+  }
+
+  .control-bar {
+    position: fixed;
+    left: 50%;
+    bottom: 8px;
+    transform: translateX(-50%);
+    width: calc(100vw - 16px);
+    max-width: 420px;
+    padding: 8px 10px;
+    gap: 8px;
+    border-radius: 18px;
+    z-index: 110;
+  }
+
+  .ctrl-btn {
+    flex: 1;
+    min-width: 0;
+    padding: 8px 6px;
+    font-size: 10px;
+    gap: 2px;
+  }
+
+  .raise-hand-btn {
+    position: fixed;
+    right: 12px;
+    bottom: 92px;
+    width: 50px;
+    height: 50px;
+    font-size: 18px;
+    z-index: 115;
+  }
+}
+
+@media (max-width: 480px) {
+  .studentLayout__page {
+    padding: 6px !important;
+  }
+
+  .main-stage {
+    min-height: calc(100vh - 102px);
+  }
+
+  .main-stage video {
+    min-height: calc(100vh - 102px);
+  }
+
+  .ov-btn {
+    width: 34px;
+    height: 34px;
+  }
+
+  .pip-camera {
+    width: 84px;
+    height: 56px;
+    bottom: 84px;
+  }
+
+  .chat-input-area {
+    padding-right: 68px;
+    padding-left: 8px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  .chat-input-area input {
     padding: 9px 10px;
+    font-size: 13px;
   }
 
   .chat-send-btn {
@@ -916,11 +825,9 @@
 
   .control-bar {
     width: calc(100vw - 12px);
-    max-width: none;
     bottom: 6px;
     padding: 7px 8px;
-    gap: 4px;
-    border-radius: 16px;
+    gap: 6px;
   }
 
   .ctrl-btn {
@@ -930,13 +837,9 @@
 
   .raise-hand-btn {
     right: 10px;
-    bottom: 76px;
-    width: 48px;
-    height: 48px;
-  }
-
-  .ov-btn {
-    width: 34px;
-    height: 34px;
+    bottom: 86px;
+    width: 46px;
+    height: 46px;
+    font-size: 16px;
   }
 }
