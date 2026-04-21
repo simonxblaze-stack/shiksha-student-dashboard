@@ -231,15 +231,6 @@ export default function Dashboard() {
     }
   };
 
-  function getDateStyle(dateKey) {
-    const types = calendarEvents[dateKey];
-    if (!types || types.length === 0) return {};
-    const colors = types.map((t) => EVENT_COLORS[t]).filter(Boolean);
-    if (colors.length === 0) return {};
-    if (colors.length === 1) return { background: colors[0], color: "#1f2d3d" };
-    return { background: `linear-gradient(135deg, ${colors.join(", ")})`, color: "#1f2d3d" };
-  }
-
   const renderCalendarGrid = () => (
     <>
       <div className="calendarHeader">
@@ -276,17 +267,26 @@ export default function Dashboard() {
             selectedDate.month === currMonth &&
             selectedDate.year === currYear;
           const dateKey = `${currYear}-${String(currMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-          const eventStyle = !isToday && !isSelected && calendarEvents[dateKey]
-            ? getDateStyle(dateKey) : {};
+          const hasEvents = calendarEvents[dateKey]?.length > 0;
 
           return (
             <div
               key={day}
               className={`calDate ${isToday ? "calToday" : ""} ${isSelected ? "calSelected" : ""}`}
-              style={eventStyle}
               onClick={() => handleDateClick(day)}
             >
               {day}
+              {hasEvents && !isSelected && (
+                <span className="calDate__dots">
+                  {calendarEvents[dateKey].map((type) => (
+                    <span
+                      key={type}
+                      className="calDate__dot"
+                      style={{ background: EVENT_COLORS[type] }}
+                    />
+                  ))}
+                </span>
+              )}
             </div>
           );
         })}
