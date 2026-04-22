@@ -7,33 +7,38 @@
   gap: 2px;
 }
 
-.liveBackBtnHeader {
-  background: #0a808a;
-  border: none;
-  padding: 5px 12px;
-  border-radius: 6px;
-  font-size: 12px;
-  cursor: pointer;
-  font-weight: 600;
-  color: white;
-  align-self: flex-start;
-}
-
-/* header box */
 .liveSessionsHeaderBox {
   width: 100%;
   background: white;
   border-radius: 18px 18px 0 0;
-  padding: 20px 24px;
+  padding: 20px 24px 14px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .liveSessionsHeaderBox .pageHeader {
   padding-bottom: 0;
   margin-bottom: 0;
   border-bottom: none;
+  flex: 1;
 }
 
-/* body box */
+.liveSubjectFilter {
+  padding: 7px 12px;
+  border-radius: 8px;
+  border: 1.5px solid #e2e8f0;
+  font-size: 13px;
+  background: #f8fafc;
+  color: #374151;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.liveSubjectFilter:focus { border-color: #0a808a; }
+
 .liveSessionsBodyBox {
   flex: 1;
   min-height: 0;
@@ -44,101 +49,157 @@
   padding: 24px;
 }
 
-
 .liveGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 212px);
-  gap: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 20px;
 }
 
 .liveCard {
   display: flex;
   flex-direction: column;
-  width: 212px;
-  height: 234px;
-  background: #0a808a;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
-  color: white;
+  background: #fff;
+  border: 1.5px solid #e8f0f1;
+  box-shadow: 0 2px 8px rgba(10,128,138,0.07);
   cursor: pointer;
-  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
-  transition: 0.3s;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .liveCard:hover {
-  background: #086a73;
-  transform: translateY(-3px);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(10,128,138,0.15);
 }
 
-/* image */
-.liveCardImg {
+.liveCard--disabled { cursor: not-allowed; opacity: 0.6; }
+.liveCard--disabled:hover { transform: none; box-shadow: 0 2px 8px rgba(10,128,138,0.07); }
+
+.liveCard__thumb {
+  position: relative;
   width: 100%;
   height: 120px;
-  object-fit: cover;
+  overflow: hidden;
 }
 
-/* card body */
-.liveCardBody {
-  padding: 12px;
-  flex: 1;
+.liveCard__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.liveCard:hover .liveCard__img { transform: scale(1.05); }
+
+.liveCard__badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 20px;
+  backdrop-filter: blur(4px);
+  white-space: nowrap;
+}
+
+.liveCard__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(10,128,138,0.88);
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  gap: 10px;
+  opacity: 0;
+  transition: opacity 0.25s ease;
 }
 
-.liveCardText {
+.liveCard:hover:not(.liveCard--disabled) .liveCard__overlay { opacity: 1; }
+
+.liveCard__desc {
+  font-size: 11px;
+  color: rgba(255,255,255,0.92);
+  text-align: center;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0;
+}
+
+.liveCard__joinBtn {
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.4);
+  padding: 5px 14px;
+  border-radius: 20px;
+}
+
+.liveCard__body {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+}
+
+.liveCard__subject {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #0a808a;
+  margin: 0;
+}
+
+.liveCard__title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.liveCard__teacher {
+  font-size: 11px;
+  color: #6b7280;
+  margin: 2px 0 0;
+}
+
+.liveCard__time {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.liveCard__time span {
   font-size: 10px;
+  color: #94a3b8;
   font-weight: 500;
-  opacity: 0.95;
-  line-height: 1.15;
 }
-
-/* ===== MOBILE ===== */
 
 @media (max-width: 768px) {
-  .liveSessionsHeaderBox {
-    padding: 14px 16px;
-    border-radius: 0;
-  }
+  .liveSessionsHeaderBox { padding: 14px 16px; border-radius: 0; }
+  .liveSessionsBodyBox { padding: 16px; border-radius: 0; }
+  .liveGrid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .liveCard__thumb { height: 90px; }
+  .liveCard__overlay { display: none; }
+}
 
-  .liveSessionsBodyBox {
-    padding: 16px;
-    border-radius: 0;
-  }
-
-  .liveGrid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 14px;
-  }
-
-  .liveCard {
-    width: 100%;
-    height: auto;
-    min-height: 108px;
-    border-radius: 14px;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    padding: 16px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-  }
-
-  .liveCardImg {
-    display: none;
-  }
-
-  .liveCardBody {
-    padding: 0;
-    align-items: center;
-    gap: 5px;
-  }
-
-  .liveCardText {
-    font-size: 12px;
-  }
-
-  .liveCardText:first-child {
-    font-size: 14px;
-    font-weight: 700;
-  }
+@media (max-width: 400px) {
+  .liveGrid { grid-template-columns: 1fr; }
 }
