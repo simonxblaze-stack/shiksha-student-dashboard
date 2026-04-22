@@ -5,7 +5,7 @@ export default function SessionCard({ id, subject, topic, teacher, startsIn, tim
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate(`/live/${id}`);
+    navigate(`/live-sessions`);
   };
 
   return (
@@ -16,15 +16,17 @@ export default function SessionCard({ id, subject, topic, teacher, startsIn, tim
       tabIndex={0}
       onKeyDown={(e) => e.key === "Enter" && handleClick()}
     >
-      <div className="sessionCard__top">
-        <h4 className="sessionCard__subject">{subject}</h4>
-        <p className="sessionCard__topic">{topic}</p>
-        <p className="sessionCard__teacher">{teacher}</p>
-      </div>
+      <div className="sessionCard__content">
+        <div className="sessionCard__top">
+          <h4 className="sessionCard__subject">{subject}</h4>
+          <p className="sessionCard__topic">{topic || "Title/Topic"}</p>
+          <p className="sessionCard__teacher">{teacher}</p>
+        </div>
 
-      <div className="sessionCard__bottom">
-        <p className="sessionCard__startsIn">{startsIn}</p>
-        <p className="sessionCard__timing">{timing}</p>
+        <div className="sessionCard__bottom">
+          <p className="sessionCard__startsIn">{startsIn}</p>
+          <p className="sessionCard__timing">{timing}</p>
+        </div>
       </div>
     </div>
   );

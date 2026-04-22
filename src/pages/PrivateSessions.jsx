@@ -378,17 +378,24 @@ function HistoryDetail({ session, onBack }) {
 /* ═══════════════════════════════════════════════════════════
    SCHEDULED TAB
 ═══════════════════════════════════════════════════════════ */
-function ScheduledTab({ onEnterRoom, searchTerm = "" }) {
+function ScheduledTab({ onEnterRoom, searchTerm = "", registerRefresh }) {
   const [sessions, setSessions] = useState([]);
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const load = useCallback(() => {
     privateSession.getSessions("scheduled").then((data) => {
       setSessions(data);
       setLoading(false);
     }).catch(() => setLoading(false));
   }, []);
+
+  useEffect(() => { load(); }, [load]);
+
+  // Register refresh callback so WebSocket can trigger it
+  useEffect(() => {
+    registerRefresh?.(load);
+  }, [load, registerRefresh]);
 
   const handleConfirm = async (id) => {
     await privateSession.confirmReschedule(id);
@@ -501,7 +508,7 @@ function RequestedCard({ item, onClick }) {
 /* ═══════════════════════════════════════════════════════════
    REQUESTS TAB
 ═══════════════════════════════════════════════════════════ */
-function RequestsTab({ onUnreadChange, searchTerm = "" }) {
+function RequestsTab({ onUnreadChange, searchTerm = "", registerRefresh }) {
   const [requests, setRequests] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [selected, setSelected] = useState(null);
@@ -516,6 +523,11 @@ function RequestsTab({ onUnreadChange, searchTerm = "" }) {
   }, [onUnreadChange]);
 
   useEffect(() => { loadRequests(); }, [loadRequests]);
+
+  // Register so WebSocket can trigger refresh
+  useEffect(() => {
+    registerRefresh?.(loadRequests);
+  }, [loadRequests, registerRefresh]);
 
   const handleCancel = async (id) => {
     await privateSession.cancelSession(id);
@@ -1108,17 +1120,23 @@ function Step4({ data, displayName }) {
 /* ═══════════════════════════════════════════════════════════
    HISTORY TAB
 ═══════════════════════════════════════════════════════════ */
-function HistoryTab({ searchTerm = "" }) {
+function HistoryTab({ searchTerm = "", registerRefresh }) {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
   const [selected, setSelected] = useState(null);
 
-  useEffect(() => {
+  const loadHistory = useCallback(() => {
     privateSession.getSessions("history")
       .then((data) => { setHistory(data); setLoading(false); })
       .catch(() => setLoading(false));
   }, []);
+
+  useEffect(() => { loadHistory(); }, [loadHistory]);
+
+  useEffect(() => {
+    registerRefresh?.(loadHistory);
+  }, [loadHistory, registerRefresh]);
 
   const searchFilter = (items) => {
     if (!searchTerm.trim()) return items;
@@ -1191,6 +1209,46 @@ export default function PrivateSessions() {
   const [requestsUnread, setRequestsUnread] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
 
+  // Callbacks registered by child tabs so WebSocket can trigger their refresh
+  const refreshCallbacksRef = useRef({});
+  const registerRefresh = (tab, fn) => { refreshCallbacksRef.current[tab] = fn; };
+
+  // ── Global per-user WebSocket for real-time session updates ──
+  useEffect(() => {
+    const proto = window.location.protocol === "https:" ? "wss" : "ws";
+    const wsHost = import.meta.env.VITE_WS_HOST || window.location.host;
+    const token = localStorage.getItem("access") || sessionStorage.getItem("access") || "";
+    const url = `${proto}://${wsHost}/ws/private-session/notify/${token ? `?token=${token}` : ""}`;
+    const ws = new WebSocket(url);
+
+    ws.onmessage = (e) => {
+      try {
+        const msg = JSON.parse(e.data);
+        if (msg.type !== "session_update") return;
+        const s = msg.data;
+
+        // Refresh whichever tab(s) this session now belongs to
+        const scheduledStatuses = ["approved", "ongoing", "needs_reconfirmation"];
+        const requestStatuses   = ["pending"];
+        const historyStatuses   = ["completed", "cancelled", "declined", "expired",
+                                   "withdrawn", "teacher_no_show", "student_no_show"];
+
+        if (scheduledStatuses.includes(s.status)) {
+          refreshCallbacksRef.current["scheduled"]?.();
+        } else if (requestStatuses.includes(s.status)) {
+          refreshCallbacksRef.current["requests"]?.();
+        } else if (historyStatuses.includes(s.status)) {
+          refreshCallbacksRef.current["scheduled"]?.();
+          refreshCallbacksRef.current["requests"]?.();
+          refreshCallbacksRef.current["history"]?.();
+        }
+      } catch {}
+    };
+
+    ws.onerror = () => {};
+    return () => ws.close();
+  }, []);
+
   const handleEnterRoom = (session) => navigate(`/private-session/live/${session.id}`);
 
   const handleTabChange = (tab) => {
@@ -1231,9 +1289,9 @@ export default function PrivateSessions() {
           />
         </div>
         <div className="ps__tabContent">
-          {activeTab === "scheduled" && <ScheduledTab onEnterRoom={handleEnterRoom} searchTerm={searchTerm} />}
-          {activeTab === "requests"  && <RequestsTab onUnreadChange={setRequestsUnread} searchTerm={searchTerm} />}
-          {activeTab === "history"   && <HistoryTab searchTerm={searchTerm} />}
+          {activeTab === "scheduled" && <ScheduledTab onEnterRoom={handleEnterRoom} searchTerm={searchTerm} registerRefresh={(fn) => registerRefresh("scheduled", fn)} />}
+          {activeTab === "requests"  && <RequestsTab onUnreadChange={setRequestsUnread} searchTerm={searchTerm} registerRefresh={(fn) => registerRefresh("requests", fn)} />}
+          {activeTab === "history"   && <HistoryTab searchTerm={searchTerm} registerRefresh={(fn) => registerRefresh("history", fn)} />}
         </div>
       </div>
     </div>

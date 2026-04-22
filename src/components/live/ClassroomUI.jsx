@@ -5,11 +5,46 @@ import ChatPanel from "./ChatPanel";
 import TeacherControls from "./TeacherControls";
 import RaiseHandButton from "./RaiseHandButton";
 import ControlBar from "./ControlBar";
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import "../../styles/live.css";
 import useLiveSessionChat from "../../hooks/useLiveSessionChat";
 import { MdFullscreen, MdFullscreenExit } from "react-icons/md";
 import { IoChatbubblesOutline } from "react-icons/io5";
+
+
+function PausedScreen({ onLeave }) {
+  const [elapsed, setElapsed] = React.useState(0);
+  React.useEffect(() => {
+    const id = setInterval(() => setElapsed((e) => e + 1), 1000);
+    return () => clearInterval(id);
+  }, []);
+  const mins = Math.floor(elapsed / 60);
+  const secs = elapsed % 60;
+  const timeStr = mins > 0 ? mins + "m " + secs + "s" : secs + "s";
+  return (
+    <div style={{
+      height: "100vh", display: "flex", alignItems: "center",
+      justifyContent: "center", flexDirection: "column",
+      background: "#0d1117", color: "#e8eaf2", gap: 16,
+    }}>
+      <div style={{ fontSize: 52 }}>&#9208;</div>
+      <h2 style={{ margin: 0, fontWeight: 600 }}>Session paused by teacher</h2>
+      <p style={{ color: "#6b7591", margin: 0, fontSize: 14 }}>
+        Paused for {timeStr} — please wait
+      </p>
+      <button
+        onClick={onLeave}
+        style={{
+          marginTop: 8, padding: "8px 20px", borderRadius: 8,
+          background: "#1e293b", color: "#e2e8f0", border: "1px solid #334155",
+          cursor: "pointer", fontSize: 13,
+        }}
+      >
+        Leave Session
+      </button>
+    </div>
+  );
+}
 
 export default function ClassroomUI({ role, sessionId: sessionIdProp, onLeave }) {
   const isPresenter = role === "PRESENTER";
@@ -26,6 +61,17 @@ export default function ClassroomUI({ role, sessionId: sessionIdProp, onLeave })
   useEffect(() => {
     setSessionStatus(hookStatus);
   }, [hookStatus]);
+
+  // Listen for local raise-hand (own client doesn't get dataReceived echo)
+  useEffect(() => {
+    const handleLocal = (e) => {
+      const { type, identity } = e.detail;
+      if (type === "raise-hand") setRaisedHands((prev) => ({ ...prev, [identity]: true }));
+      if (type === "lower-hand") setRaisedHands((prev) => { const u = { ...prev }; delete u[identity]; return u; });
+    };
+    window.addEventListener("raise-hand-local", handleLocal);
+    return () => window.removeEventListener("raise-hand-local", handleLocal);
+  }, []);
 
   useEffect(() => {
     const handleData = (payload, participant) => {
@@ -139,8 +185,8 @@ if (!isPresenter && sessionStatus === "PAUSED") {
         {isPresenter && <TeacherControls sessionId={sessionId} onLeave={onLeave} />}
         <div className="video-overlay-actions">
           <button className="ov-btn" onClick={() => setSidebarOpen((v) => !v)}>
-            <IoChatbubblesOutline size={17} />
-          </button>
+  {sidebarOpen ? "✕" : <IoChatbubblesOutline size={17} />}
+</button>
           <button className="ov-btn" onClick={toggleFullscreen}>
             {isFullscreen ? <MdFullscreenExit size={19} /> : <MdFullscreen size={19} />}
           </button>
@@ -148,14 +194,18 @@ if (!isPresenter && sessionStatus === "PAUSED") {
       </div>
 
       {sidebarOpen && (
-        <div className="right-sidebar">
-          <ParticipantsPanel raisedHands={raisedHands} />
-          <ChatPanel role={role} messages={chatMessages} onSendMessage={sendMessage} />
-        </div>
-      )}
+  <div className="right-sidebar">
+    <ParticipantsPanel raisedHands={raisedHands} />
+    <ChatPanel role={role} messages={chatMessages} onSendMessage={sendMessage} />
+    {!isPresenter && (
+      <div className="chat-raise-hand-wrap">
+        <RaiseHandButton />
+      </div>
+    )}
+  </div>
+)}
 
-      <ControlBar onLeave={onLeave} />
-      {!isPresenter && <RaiseHandButton />}
+<ControlBar onLeave={onLeave} />
     </div>
   );
 }

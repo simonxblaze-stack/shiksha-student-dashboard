@@ -11,11 +11,14 @@ import { IoSend } from "react-icons/io5";
  */
 export default function ChatPanel({ role, messages = [], onSendMessage }) {
   const [input, setInput] = useState("");
-  const bottomRef = useRef(null);
+  const containerRef = useRef(null);
 
   /* ── Auto scroll on new messages ── */
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (!containerRef.current) return;
+    const el = containerRef.current;
+    const isNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 100;
+    if (isNearBottom) el.scrollTop = el.scrollHeight;
   }, [messages]);
 
   /* ── Send ── */
@@ -45,7 +48,7 @@ export default function ChatPanel({ role, messages = [], onSendMessage }) {
     <div className="chat-panel">
       <div className="chat-header">CHAT</div>
 
-      <div className="chat-messages">
+      <div className="chat-messages" ref={containerRef}>
         {messages.length === 0 && (
           <p className="chat-empty">No messages yet. Say hello!</p>
         )}
@@ -53,9 +56,8 @@ export default function ChatPanel({ role, messages = [], onSendMessage }) {
         {messages.map((msg, i) => (
           <div key={msg.id || i} className={`chat-row ${msg.isMe ? "me" : "other"}`}>
             <div
-              className={`chat-bubble ${msg.isMe ? "me-bubble" : ""} ${
-                !msg.isMe && msg.isTeacher ? "teacher-bubble" : ""
-              }`}
+              className={`chat-bubble ${msg.isMe ? "me-bubble" : ""} ${!msg.isMe && msg.isTeacher ? "teacher-bubble" : ""
+                }`}
             >
               <span className="chat-name">{msg.isMe ? "YOU" : msg.sender}</span>
               <div className="chat-text">{msg.text}</div>
@@ -64,7 +66,6 @@ export default function ChatPanel({ role, messages = [], onSendMessage }) {
           </div>
         ))}
 
-        <div ref={bottomRef} />
       </div>
 
       <div className="chat-input-area">
