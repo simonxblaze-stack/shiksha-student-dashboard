@@ -14,7 +14,7 @@
 /* Sessions + Calendar */
 .dashExact__top {
   display: grid;
-  grid-template-columns: 1.95fr 0.95fr;
+  grid-template-columns: 2fr 0.95fr;
   gap: 14px;
   align-items: stretch;
   flex-shrink: 0;
@@ -67,7 +67,7 @@
 .dashExact__top > .whiteCard {
   display: flex;
   flex-direction: column;
-  min-height: 182px;
+  min-height: 168px;
 }
 
 /* ===== CARD HEADER ===== */
@@ -144,9 +144,9 @@
 }
 
 .sessionsScrollRow > * {
-  flex: 0 0 172px;
-  min-width: 172px;
-  max-width: 172px;
+  flex: 0 0 185px;
+  min-width: 185px;
+  max-width: 185px;
 }
 /* ===== EMPTY STATE ===== */
 

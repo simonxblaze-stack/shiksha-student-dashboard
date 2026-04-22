@@ -5,7 +5,7 @@
   border-radius: 12px;
   color: #ffffff;
   width: 100%;
-  min-height: 148px;
+  min-height: 128px;
   padding: 0;
   display: flex;
   cursor: pointer;
@@ -25,11 +25,11 @@
 
 .sessionCard__content {
   width: 100%;
-  padding: 14px 14px 12px;
+  padding: 13px 14px 11px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 148px;
+  min-height: 128px;
 }
 
 .sessionCard__top {
@@ -39,7 +39,7 @@
 }
 
 .sessionCard__subject {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 800;
   line-height: 1.28;
   margin: 0;
