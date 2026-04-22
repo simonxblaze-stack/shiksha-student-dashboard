@@ -244,7 +244,7 @@ export default function PrivateClassroomUI({ role, session }) {
       });
       setChatMessages(msgs);
     }).catch(() => {});
-  }, [session?.id, localParticipant?.name]);
+  }, [session?.id, myUserId]);
 
   // ── WebSocket for real-time chat — with token auth + auto-reconnect ──
   useEffect(() => {
@@ -267,7 +267,7 @@ export default function PrivateClassroomUI({ role, session }) {
             if (data) {
               setChatMessages((prev) => {
                 if (prev.some((m) => m.id === data.id)) return prev;
-                const isMe = myName && data.sender_name === myName;
+                const isMe = myUserId && String(data.sender_id) === myUserId;
                 if (!isMe) soundManager.messageReceive();
                 return [...prev, {
                   id: data.id,
@@ -294,7 +294,7 @@ export default function PrivateClassroomUI({ role, session }) {
       clearTimeout(reconnectTimer);
       if (ws) ws.close();
     };
-  }, [session?.id, localParticipant?.name]);
+  }, [session?.id, myUserId]);
 
   // Get all tracks
   const tracks = useTracks([
