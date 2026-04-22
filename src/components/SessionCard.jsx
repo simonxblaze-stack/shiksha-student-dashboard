@@ -1,3 +1,7 @@
+// ============================================================
+// STUDENT — src/components/SessionCard.jsx  (FULL REPLACEMENT)
+// ============================================================
+
 import { useNavigate } from "react-router-dom";
 import "../styles/sessionCard.css";
 
@@ -5,7 +9,9 @@ export default function SessionCard({ id, subject, topic, teacher, startsIn, tim
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate(`/live/${id}`);
+    // Navigate to live sessions page — the session page itself
+    // handles the "too early" / join logic
+    navigate(`/live-sessions`);
   };
 
   return (

@@ -119,6 +119,41 @@ export default function Dashboard() {
 
   const collapsedSessions = sessions.slice(0, 3);
 
+  // Compute timing + startsIn from raw API dateTime field
+  // and fix navigation to /live-sessions instead of /live/:id
+  const renderSessionCard = (s, idx) => {
+    const sessionTime = new Date(s.dateTime);
+    const now         = new Date();
+    const diffMs      = sessionTime - now;
+    const diffMins    = Math.round(diffMs / 60000);
+
+    let startsIn;
+    if (diffMs < 0) {
+      startsIn = "In progress";
+    } else if (diffMins < 60) {
+      startsIn = `Starts in ${diffMins} min`;
+    } else {
+      startsIn = `Starts in ${Math.floor(diffMins / 60)}h`;
+    }
+
+    const timing = sessionTime.toLocaleString("en-GB", {
+      day: "2-digit", month: "short", year: "numeric",
+      hour: "2-digit", minute: "2-digit", hour12: true,
+    });
+
+    return (
+      <SessionCard
+        key={s.id || idx}
+        id={s.id}
+        subject={s.subject}
+        topic={s.topic}
+        teacher={s.teacher}
+        startsIn={startsIn}
+        timing={timing}
+      />
+    );
+  };
+
   // Calendar event map — FIX: live sessions now included
   const calendarEvents = useMemo(() => {
     const map = {};
@@ -231,6 +266,15 @@ export default function Dashboard() {
     }
   };
 
+  function getDateStyle(dateKey) {
+    const types = calendarEvents[dateKey];
+    if (!types || types.length === 0) return {};
+    const colors = types.map((t) => EVENT_COLORS[t]).filter(Boolean);
+    if (colors.length === 0) return {};
+    if (colors.length === 1) return { background: colors[0], color: "#1f2d3d" };
+    return { background: `linear-gradient(135deg, ${colors.join(", ")})`, color: "#1f2d3d" };
+  }
+
   const renderCalendarGrid = () => (
     <>
       <div className="calendarHeader">
@@ -267,26 +311,17 @@ export default function Dashboard() {
             selectedDate.month === currMonth &&
             selectedDate.year === currYear;
           const dateKey = `${currYear}-${String(currMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-          const hasEvents = calendarEvents[dateKey]?.length > 0;
+          const eventStyle = !isToday && !isSelected && calendarEvents[dateKey]
+            ? getDateStyle(dateKey) : {};
 
           return (
             <div
               key={day}
               className={`calDate ${isToday ? "calToday" : ""} ${isSelected ? "calSelected" : ""}`}
+              style={eventStyle}
               onClick={() => handleDateClick(day)}
             >
               {day}
-              {hasEvents && !isSelected && (
-                <span className="calDate__dots">
-                  {calendarEvents[dateKey].map((type) => (
-                    <span
-                      key={type}
-                      className="calDate__dot"
-                      style={{ background: EVENT_COLORS[type] }}
-                    />
-                  ))}
-                </span>
-              )}
             </div>
           );
         })}
@@ -344,9 +379,7 @@ export default function Dashboard() {
       case "sessions":
         return (
           <div className="mobileSectionContent">
-            {(showAllSessions ? sessions : collapsedSessions).map((s, idx) => (
-              <SessionCard key={idx} {...s} />
-            ))}
+            {(showAllSessions ? sessions : collapsedSessions).map((s, idx) => renderSessionCard(s, idx))}
             {sessions.length === 0 && (
               <div className="emptyState">No upcoming live sessions</div>
             )}
@@ -432,9 +465,7 @@ export default function Dashboard() {
               </button>
             </div>
             <div className={showAllSessions ? "sessionsGridExpanded" : "sessionsGridCollapsed"}>
-              {(showAllSessions ? sessions : collapsedSessions).map((s, idx) => (
-                <SessionCard key={idx} {...s} />
-              ))}
+              {(showAllSessions ? sessions : collapsedSessions).map((s, idx) => renderSessionCard(s, idx))}
               {sessions.length === 0 && (
                 <div className="emptyState">No upcoming live sessions for today</div>
               )}
