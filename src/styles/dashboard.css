@@ -14,7 +14,7 @@
 /* Sessions + Calendar */
 .dashExact__top {
   display: grid;
-  grid-template-columns: 2.05fr 1fr;
+  grid-template-columns: 1.95fr 0.95fr;
   gap: 14px;
   align-items: stretch;
   flex-shrink: 0;
@@ -67,7 +67,7 @@
 .dashExact__top > .whiteCard {
   display: flex;
   flex-direction: column;
-  min-height: 192px;
+  min-height: 182px;
 }
 
 /* ===== CARD HEADER ===== */
@@ -116,9 +116,8 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 10px;
+  margin-bottom: 18px;
 }
-
 .sessionCountText {
   margin: 0;
   font-size: 13px;
@@ -130,10 +129,10 @@
 
 .sessionsScrollRow {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 2px 0 4px;
+  padding: 4px 0 6px;
   scroll-behavior: smooth;
   min-width: 0;
   align-items: stretch;
@@ -145,11 +144,10 @@
 }
 
 .sessionsScrollRow > * {
-  flex: 0 0 148px;
-  min-width: 148px;
-  max-width: 148px;
+  flex: 0 0 172px;
+  min-width: 172px;
+  max-width: 172px;
 }
-
 /* ===== EMPTY STATE ===== */
 
 .liveEmptyState {
