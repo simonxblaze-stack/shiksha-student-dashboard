@@ -45,7 +45,7 @@ export default function ChatPanel({ role, messages = [], onSendMessage }) {
     <div className="chat-panel">
       <div className="chat-header">CHAT</div>
 
-      <div className="chat-messages">
+      <div className="chat-messages" ref={containerRef}>
         {messages.length === 0 && (
           <p className="chat-empty">No messages yet. Say hello!</p>
         )}
@@ -64,7 +64,6 @@ export default function ChatPanel({ role, messages = [], onSendMessage }) {
           </div>
         ))}
 
-        <div ref={bottomRef} />
       </div>
 
       <div className="chat-input-area">
