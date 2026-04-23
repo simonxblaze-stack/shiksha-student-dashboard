@@ -955,3 +955,40 @@ body,
 }
 .chat-send-btn:hover { background: #3d6ee0; transform: scale(1.05); }
 .chat-send-btn:active { transform: scale(0.95); }
+
+
+/* ── Mobile Chat Overlay Only ── */
+.pvt-mobile-chat-backdrop {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .pvt-mobile-chat-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.42);
+    z-index: 119;
+  }
+
+  .pvt-room.pvt-mobile-chat-open .pvt-sidebar {
+    position: fixed;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    top: auto;
+    width: auto;
+    height: min(72dvh, 520px);
+    z-index: 120;
+    border-radius: 16px;
+    border-left: 1px solid rgba(255,255,255,0.08);
+    border-top: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 18px 40px rgba(0,0,0,0.45);
+    overflow: hidden;
+  }
+
+  .pvt-room.pvt-mobile-chat-open .pvt-sidebar-body {
+    min-height: 0;
+    overflow-y: auto;
+  }
+}

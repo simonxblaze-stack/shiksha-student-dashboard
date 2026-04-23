@@ -468,7 +468,7 @@ export default function PrivateClassroomUI({ role, session }) {
   const showSpotlight = pinnedTracks.length === 1 && totalTiles > 1;
 
   return (
-    <div className="pvt-room">
+    <div className={`pvt-room ${sidebarOpen && sidebarTab === "chat" ? "pvt-mobile-chat-open" : ""}`}>
       {/* ── Top Bar ── */}
       <div className="pvt-topbar">
         <div className="pvt-topbar-left">
@@ -569,7 +569,20 @@ export default function PrivateClassroomUI({ role, session }) {
               </button>
               <button
                 className={`pvt-ctrl-btn ${sidebarTab === "chat" && sidebarOpen ? "pvt-ctrl-active" : ""}`}
-                onClick={() => { setSidebarTab("chat"); setSidebarOpen((o) => sidebarTab === "chat" ? !o : true); }}
+                onClick={() => {
+                  if (window.innerWidth <= 768) {
+                    if (sidebarTab === "chat" && sidebarOpen) {
+                      setSidebarOpen(false);
+                    } else {
+                      setSidebarTab("chat");
+                      setSidebarOpen(true);
+                    }
+                    return;
+                  }
+
+                  setSidebarTab("chat");
+                  setSidebarOpen((o) => sidebarTab === "chat" ? !o : true);
+                }}
                 title="Chat"
               >
                 💬
@@ -587,6 +600,13 @@ export default function PrivateClassroomUI({ role, session }) {
             </div>
           </div>
         </div>
+
+        {sidebarOpen && sidebarTab === "chat" && (
+          <div
+            className="pvt-mobile-chat-backdrop"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
 
         {/* ── Sidebar ── */}
         {sidebarOpen && (
