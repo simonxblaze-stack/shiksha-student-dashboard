@@ -114,7 +114,7 @@ export default function Dashboard() {
     fetchDashboard();
   }, [activeCourse]);
 
-  const sessions = data?.sessions ?? [];
+const sessions = data?.sessions?.length ? data.sessions : (data?.all_sessions ?? []);
   const allSessions = data?.all_sessions ?? [];
   const assignments = data?.assignments ?? [];
   const quizzes = data?.quizzes ?? [];
