@@ -21,7 +21,9 @@ function formatDate(dateStr) {
 function toDateKey(dateStr) {
   if (!dateStr) return null;
   const d = new Date(dateStr);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
+    d.getDate()
+  ).padStart(2, "0")}`;
 }
 
 function isSameDay(a, b) {
@@ -61,32 +63,25 @@ export default function Dashboard() {
   const [currYear, setCurrYear] = useState(today.getFullYear());
 
   const months = [
-    "January","February","March","April","May","June",
-    "July","August","September","October","November","December"
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
+
   const years = Array.from({ length: 81 }, (_, i) => 1970 + i);
 
   const daysInMonth = new Date(currYear, currMonth + 1, 0).getDate();
   const firstDayIdx = new Date(currYear, currMonth, 1).getDay();
   const startOffset = firstDayIdx === 0 ? 6 : firstDayIdx - 1;
-
-  const goToPrevMonth = () => {
-    if (currMonth === 0) {
-      setCurrMonth(11);
-      setCurrYear((y) => y - 1);
-    } else {
-      setCurrMonth((m) => m - 1);
-    }
-  };
-
-  const goToNextMonth = () => {
-    if (currMonth === 11) {
-      setCurrMonth(0);
-      setCurrYear((y) => y + 1);
-    } else {
-      setCurrMonth((m) => m + 1);
-    }
-  };
 
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -114,17 +109,14 @@ export default function Dashboard() {
     fetchDashboard();
   }, [activeCourse]);
 
-const sessions = data?.sessions?.length ? data.sessions : (data?.all_sessions ?? []);
+  const sessions = data?.sessions?.length ? data.sessions : data?.all_sessions ?? [];
   const allSessions = data?.all_sessions ?? [];
   const assignments = data?.assignments ?? [];
   const quizzes = data?.quizzes ?? [];
   const privateSessions = data?.private_sessions ?? [];
   const apiNotifications = data?.notifications ?? [];
-  console.log("FULL DASHBOARD DATA:", data);
-console.log("sessions:", data?.sessions);
-console.log("all_sessions:", data?.all_sessions);
 
-  const notifications = (() => {
+  const notifications = useMemo(() => {
     const seen = new Set();
     const merged = [];
     for (const n of [...liveNotifications, ...apiNotifications]) {
@@ -135,7 +127,25 @@ console.log("all_sessions:", data?.all_sessions);
       }
     }
     return merged;
-  })();
+  }, [liveNotifications, apiNotifications]);
+
+  const goToPrevMonth = () => {
+    if (currMonth === 0) {
+      setCurrMonth(11);
+      setCurrYear((y) => y - 1);
+    } else {
+      setCurrMonth((m) => m - 1);
+    }
+  };
+
+  const goToNextMonth = () => {
+    if (currMonth === 11) {
+      setCurrMonth(0);
+      setCurrYear((y) => y + 1);
+    } else {
+      setCurrMonth((m) => m + 1);
+    }
+  };
 
   const renderSessionCard = (s, idx) => {
     const sessionTime = new Date(s.dateTime);
@@ -246,16 +256,6 @@ console.log("all_sessions:", data?.all_sessions);
     return items;
   }, [allSessions, assignments, quizzes, privateSessions]);
 
-  if (loading) return <div style={{ padding: 20 }}>Loading dashboard...</div>;
-
-  if (!activeCourse) {
-    return (
-      <div style={{ padding: 20 }}>
-        <p>No course selected. Please select a course to view your dashboard.</p>
-      </div>
-    );
-  }
-
   const filteredNotifications =
     notificationFilter === "All"
       ? notifications
@@ -297,13 +297,15 @@ console.log("all_sessions:", data?.all_sessions);
   const renderCalendarGrid = () => (
     <>
       <div className="calendarHeader">
-        <span className="calNavBtn" onClick={goToPrevMonth}>◀</span>
+        <button type="button" className="calNavBtn" onClick={goToPrevMonth}>
+          ◀
+        </button>
 
         <div className="calendarHeader__mid">
           <select
             className="calendarSelect"
             value={currMonth}
-            onChange={(e) => setCurrMonth(parseInt(e.target.value))}
+            onChange={(e) => setCurrMonth(parseInt(e.target.value, 10))}
           >
             {months.map((m, i) => (
               <option key={m} value={i}>
@@ -315,7 +317,7 @@ console.log("all_sessions:", data?.all_sessions);
           <select
             className="calendarSelect"
             value={currYear}
-            onChange={(e) => setCurrYear(parseInt(e.target.value))}
+            onChange={(e) => setCurrYear(parseInt(e.target.value, 10))}
           >
             {years.map((y) => (
               <option key={y} value={y}>
@@ -325,7 +327,9 @@ console.log("all_sessions:", data?.all_sessions);
           </select>
         </div>
 
-        <span className="calNavBtn" onClick={goToNextMonth}>▶</span>
+        <button type="button" className="calNavBtn" onClick={goToNextMonth}>
+          ▶
+        </button>
       </div>
 
       <div className="calendarGrid">
@@ -336,7 +340,7 @@ console.log("all_sessions:", data?.all_sessions);
         ))}
 
         {Array.from({ length: startOffset }).map((_, i) => (
-          <div key={`empty-${i}`} className="calDate" style={{ visibility: "hidden" }} />
+          <div key={`empty-${i}`} className="calDate calDate--blank" />
         ))}
 
         {Array.from({ length: daysInMonth }, (_, i) => {
@@ -407,12 +411,12 @@ console.log("all_sessions:", data?.all_sessions);
       item.type === "live-session"
         ? "livesessions"
         : item.type === "assignment"
-        ? "assignments"
-        : item.type === "quiz"
-        ? "quiz"
-        : item.type === "private-session"
-        ? "privatesession"
-        : "";
+          ? "assignments"
+          : item.type === "quiz"
+            ? "quiz"
+            : item.type === "private-session"
+              ? "privatesession"
+              : "";
 
     return (
       <div
@@ -442,18 +446,12 @@ console.log("all_sessions:", data?.all_sessions);
         return (
           <div className="mobileSectionContent">
             {sessions.map((s, idx) => renderSessionCard(s, idx))}
-            {sessions.length === 0 && (
-              <div className="emptyState">No upcoming live sessions</div>
-            )}
+            {sessions.length === 0 && <div className="emptyState">No upcoming live sessions</div>}
           </div>
         );
 
       case "calendar":
-        return (
-          <div className="calendarBox mobileCalendarCard">
-            {renderCalendarGrid()}
-          </div>
-        );
+        return <div className="calendarCard mobileCalendarCard">{renderCalendarGrid()}</div>;
 
       case "assign":
         return (
@@ -531,108 +529,108 @@ console.log("all_sessions:", data?.all_sessions);
     }
   };
 
+  if (loading) return <div style={{ padding: 20 }}>Loading dashboard...</div>;
+
+  if (!activeCourse) {
+    return (
+      <div style={{ padding: 20 }}>
+        <p>No course selected. Please select a course to view your dashboard.</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="dashExact">
+    <div className="dashboardShell">
       <div className="desktopOnly">
-        <div className="dashExact__top">
-          <div className="whiteCard liveSessionsCard">
-            <div className="cardHeader liveSessionsHeader">
+        <div className="dashboardGrid">
+          <section className="dashboardCard dashboardCard--live">
+            <div className="cardHeader liveHeader">
               <h3>Upcoming Live Sessions</h3>
               <p className="sessionCountText">
                 {sessions.length} Classes {sessions.length > 0 ? "(Remaining classes)" : ""}
               </p>
             </div>
 
-            <div className="sessionsScrollRow">
-              {sessions.length > 0 ? (
-                sessions.map((s, idx) => renderSessionCard(s, idx))
-              ) : (
-                <div className="liveEmptyState">
-                  <div className="liveEmptyState__icon">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M8 2V5M16 2V5M3 9H21M5 5H19C20.1046 5 21 5.89543 21 7V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V7C3 5.89543 3.89543 5 5 5ZM12 13V17M10 15H14"
-                        stroke="currentColor"
-                        strokeWidth="1.8"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </div>
-
-                  <div className="liveEmptyState__content">
-                    <p className="liveEmptyState__title">
-                      No upcoming live sessions for today
-                    </p>
-                    <p className="liveEmptyState__text">
-                      Relax and prepare for your next class!
-                    </p>
-                  </div>
+            {sessions.length > 0 ? (
+              <div className="liveCardsRow">{sessions.map((s, idx) => renderSessionCard(s, idx))}</div>
+            ) : (
+              <div className="liveEmptyState">
+                <div className="liveEmptyState__icon">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M8 2V5M16 2V5M3 9H21M5 5H19C20.1046 5 21 5.89543 21 7V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V7C3 5.89543 3.89543 5 5 5ZM12 13V17M10 15H14"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
                 </div>
-              )}
-            </div>
-          </div>
 
-          <div className="calendarBox">{renderCalendarGrid()}</div>
-        </div>
-
-        <div className="dashExact__bottom">
-          <div className="dashExact__leftCol">
-            <div className="whiteCard">
-              <div
-                className="cardHeader cardHeader--clickable"
-                onClick={() => setShowAssignments(!showAssignments)}
-              >
-                <h3>Assignments</h3>
-                <button className="arrowBtn">
-                  <span className={`arrowBtn__chevron ${showAssignments ? "arrowBtn__chevron--up" : ""}`}>
-                    <svg width="12" height="8" viewBox="0 0 12 8" fill="none">
-                      <path
-                        d="M1 1.5L6 6.5L11 1.5"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </span>
-                </button>
+                <div className="liveEmptyState__content">
+                  <p className="liveEmptyState__title">No upcoming live sessions for today</p>
+                  <p className="liveEmptyState__text">Relax and prepare for your next class!</p>
+                </div>
               </div>
+            )}
+          </section>
 
-              {showAssignments && (
-                <div className="listBody">
-                  {assignments.map((a, idx) => (
-                    <AssignmentCard key={idx} {...a} />
-                  ))}
-                  {assignments.length === 0 && (
-                    <div className="emptyState">No assignments</div>
-                  )}
-                </div>
-              )}
+          <section className="dashboardCard dashboardCard--calendar">
+            {renderCalendarGrid()}
+          </section>
+
+          <section className="dashboardCard dashboardCard--assignments">
+            <div
+              className="cardHeader cardHeader--clickable"
+              onClick={() => setShowAssignments(!showAssignments)}
+            >
+              <h3>Assignments</h3>
+
+              <button type="button" className="arrowBtn">
+                <span className={`arrowBtn__chevron ${showAssignments ? "arrowBtn__chevron--up" : ""}`}>
+                  <svg width="12" height="8" viewBox="0 0 12 8" fill="none">
+                    <path
+                      d="M1 1.5L6 6.5L11 1.5"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </span>
+              </button>
             </div>
-          </div>
 
-          <div className="whiteCard">
+            {showAssignments && (
+              <div className="cardBodyScroll">
+                {assignments.map((a, idx) => (
+                  <AssignmentCard key={idx} {...a} />
+                ))}
+                {assignments.length === 0 && <div className="emptyState">No assignments</div>}
+              </div>
+            )}
+          </section>
+
+          <section className="dashboardCard dashboardCard--notifications">
             <div className="cardHeader">
               <h3>Notifications</h3>
               <DropdownMenu value={notificationFilter} onChange={setNotificationFilter} />
             </div>
-            <div className="notifBody">
+
+            <div className="cardBodyScroll">
               {filteredNotifications.map((n) => (
                 <NotificationCard key={n.id} notification={n} onRead={markOneRead} />
               ))}
-              {filteredNotifications.length === 0 && (
-                <div className="emptyState">No notifications</div>
-              )}
+              {filteredNotifications.length === 0 && <div className="emptyState">No notifications</div>}
             </div>
-          </div>
+          </section>
 
-          <div className="whiteCard">
+          <section className="dashboardCard dashboardCard--schedule">
             <div className="cardHeader">
               <h3>
                 Schedule
                 {selectedDate && (
-                  <span style={{ fontWeight: 400, fontSize: "0.8rem", marginLeft: 8 }}>
+                  <span className="selectedDateText">
                     —{" "}
                     {new Date(
                       selectedDate.year,
@@ -644,11 +642,12 @@ console.log("all_sessions:", data?.all_sessions);
               </h3>
               <DropdownMenu value={scheduleFilter} onChange={setScheduleFilter} />
             </div>
-            <div className="scheduleList">
+
+            <div className="cardBodyScroll">
               {filteredSchedule.map((item, idx) => renderScheduleItem(item, idx))}
               {filteredSchedule.length === 0 && <div className="emptyState">No schedule</div>}
             </div>
-          </div>
+          </section>
         </div>
       </div>
 
