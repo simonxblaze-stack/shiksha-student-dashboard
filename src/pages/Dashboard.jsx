@@ -294,7 +294,11 @@ export default function Dashboard() {
     }
   };
 
-  const renderCalendarGrid = () => (
+ const renderCalendarGrid = () => {
+  const totalDateCells = 42;
+  const trailingBlanks = totalDateCells - (startOffset + daysInMonth);
+
+  return (
     <>
       <div className="calendarHeader">
         <button type="button" className="calNavBtn" onClick={goToPrevMonth}>
@@ -340,7 +344,7 @@ export default function Dashboard() {
         ))}
 
         {Array.from({ length: startOffset }).map((_, i) => (
-          <div key={`empty-${i}`} className="calDate calDate--blank" />
+          <div key={`empty-start-${i}`} className="calDate calDate--blank" />
         ))}
 
         {Array.from({ length: daysInMonth }, (_, i) => {
@@ -383,9 +387,14 @@ export default function Dashboard() {
             </button>
           );
         })}
+
+        {Array.from({ length: trailingBlanks }).map((_, i) => (
+          <div key={`empty-end-${i}`} className="calDate calDate--blank" />
+        ))}
       </div>
     </>
   );
+};
 
   const renderScheduleItem = (item, idx) => {
     const typeClass =
