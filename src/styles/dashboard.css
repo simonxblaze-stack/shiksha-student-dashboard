@@ -64,7 +64,11 @@
   flex-direction: column;
 }
 
-.dashboardCard--live,
+.dashboardCard--live {
+  padding: 14px 16px 12px;
+  justify-content: flex-start;
+}
+
 .dashboardCard--assignments,
 .dashboardCard--notifications,
 .dashboardCard--calendar,
@@ -127,12 +131,13 @@
 
 .liveCardsRow {
   display: flex;
-  gap: 10px;
+  gap: 14px;
   overflow-x: auto;
   overflow-y: hidden;
   min-width: 0;
-  padding-bottom: 2px;
+  padding-bottom: 4px;
   scrollbar-width: none;
+  align-items: stretch;
 }
 
 .liveCardsRow::-webkit-scrollbar {
@@ -140,9 +145,9 @@
 }
 
 .liveCardsRow > * {
-  flex: 0 0 180px;
-  min-width: 180px;
-  max-width: 180px;
+  flex: 0 0 235px;
+  min-width: 235px;
+  max-width: 235px;
 }
 
 .liveEmptyState {
@@ -244,7 +249,7 @@
 
 .dashboardRight {
   display: grid;
-  grid-template-rows: 255px minmax(0, 1fr);
+  grid-template-rows: 240px minmax(0, 1fr);
   gap: 14px;
   min-height: 0;
 }
@@ -349,9 +354,6 @@
   transition: background 0.15s ease;
 }
 
-.calDate:hover {
-  background: rgba(19, 137, 155, 0.08);
-}
 
 .calDate--blank {
   visibility: hidden;
