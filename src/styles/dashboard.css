@@ -33,7 +33,7 @@
 
 .dashboardLeft {
   display: grid;
-  grid-template-rows: 236px minmax(0, 1fr);
+  grid-template-rows: 248px minmax(0, 1fr);
   gap: 14px;
   min-height: 0;
 }
