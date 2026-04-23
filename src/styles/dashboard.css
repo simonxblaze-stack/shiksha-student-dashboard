@@ -165,25 +165,42 @@
 }
 
 .liveCardsRow {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: calc((100% - 20px) / 3);
-  gap: 10px;
-  overflow-x: auto;
-  overflow-y: hidden;
+  display: flex;
+  gap: 12px;
+  width: 100%;
   min-width: 0;
   min-height: 0;
-  padding-bottom: 2px;
+  overflow-x: auto;
+  overflow-y: hidden;
   align-items: stretch;
-  scrollbar-width: none;
+  padding-bottom: 8px;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+
+.liveCardsRow > * {
+  flex: 0 0 calc((100% - 24px) / 3);
+  min-width: calc((100% - 24px) / 3);
+  max-width: calc((100% - 24px) / 3);
 }
 
 .liveCardsRow::-webkit-scrollbar {
-  display: none;
+  height: 8px;
 }
 
-.liveCardsRow > * {
-  min-width: 0;
+.liveCardsRow::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 999px;
+}
+
+.liveCardsRow::-webkit-scrollbar-thumb {
+  background: rgba(8, 60, 69, 0.28);
+  border-radius: 999px;
+}
+
+.liveCardsRow::-webkit-scrollbar-thumb:hover {
+  background: rgba(8, 60, 69, 0.4);
 }
 
 .liveEmptyState {
