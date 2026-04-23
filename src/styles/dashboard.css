@@ -47,7 +47,7 @@
 
 .dashboardRight {
   display: grid;
-  grid-template-rows: 185px minmax(0, 1fr);
+  grid-template-rows: 230px minmax(0, 1fr);
   gap: 14px;
   min-height: 0;
 }
@@ -251,14 +251,16 @@
 .dashboardCard--calendar {
   display: flex;
   flex-direction: column;
-  padding: 12px 14px 10px;
+  padding: 14px 16px 12px;
+  min-height: 230px;
+  overflow: hidden;
 }
 
 .calendarHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   flex-shrink: 0;
 }
 
@@ -295,10 +297,12 @@
   cursor: pointer;
 }
 
-.calendarGrid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  row-gap: 2px;
+.calDayName {
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: #6b7280;
+  padding: 6px 0;
 }
 
 .calDayName {
@@ -313,7 +317,7 @@
   border: none;
   background: transparent;
   border-radius: 10px;
-  min-height: 34px;
+  min-height: 38px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -321,15 +325,6 @@
   padding: 3px 2px;
   cursor: pointer;
   transition: background 0.18s ease;
-}
-
-.calDate:hover {
-  background: #f3f8f8;
-}
-
-.calDate--blank {
-  visibility: hidden;
-  pointer-events: none;
 }
 
 .calDate__num {
@@ -343,6 +338,17 @@
   color: #111827;
   line-height: 1;
 }
+
+
+.calDate:hover {
+  background: #f3f8f8;
+}
+
+.calDate--blank {
+  visibility: hidden;
+  pointer-events: none;
+}
+
 
 .calDate__dots {
   display: flex;
