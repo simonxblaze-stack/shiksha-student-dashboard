@@ -610,7 +610,20 @@ export default function PrivateClassroomUI({ role, session }) {
 
         {/* ── Sidebar ── */}
         {sidebarOpen && (
-          <div className="pvt-sidebar">
+  <div className="pvt-sidebar">
+    {sidebarTab === "chat" && (
+      <div className="pvt-mobile-chat-close-wrap">
+        <button
+          className="pvt-mobile-chat-close-btn"
+          onClick={() => setSidebarOpen(false)}
+          type="button"
+          aria-label="Close chat"
+        >
+          ✕
+        </button>
+      </div>
+    )}
+
             <div className="pvt-sidebar-tabs">
               <button
                 className={`pvt-sidebar-tab ${sidebarTab === "participants" ? "active" : ""}`}

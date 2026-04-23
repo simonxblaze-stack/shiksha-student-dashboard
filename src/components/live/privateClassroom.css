@@ -992,3 +992,36 @@ body,
     overflow-y: auto;
   }
 }
+
+/* ── Mobile Chat Close Button ── */
+.pvt-mobile-chat-close-wrap {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .pvt-room.pvt-mobile-chat-open .pvt-mobile-chat-close-wrap {
+    display: flex;
+    justify-content: flex-end;
+    padding: 10px 10px 0;
+    background: #161b27;
+    flex-shrink: 0;
+  }
+
+  .pvt-mobile-chat-close-btn {
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    color: #e8eaf2;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .pvt-mobile-chat-close-btn:hover {
+    background: rgba(255,255,255,0.16);
+  }
+}
