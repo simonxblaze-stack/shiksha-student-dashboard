@@ -244,14 +244,13 @@
   transform: rotate(180deg);
 }
 
-
 /* =========================
    RIGHT COLUMN
 ========================= */
 
 .dashboardRight {
   display: grid;
-  grid-template-rows: 245px minmax(0, 1fr);
+  grid-template-rows: 210px minmax(0, 1fr);
   gap: 14px;
   min-height: 0;
 }
@@ -263,8 +262,9 @@
 .dashboardCard--calendar {
   display: flex;
   flex-direction: column;
-  padding: 12px 14px 10px;
-  min-height: 245px;
+  justify-content: flex-start;
+  padding: 14px 16px 12px;
+  min-height: 210px;
   overflow: hidden;
 }
 
@@ -272,7 +272,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   flex-shrink: 0;
 }
 
@@ -309,18 +309,16 @@
   cursor: pointer;
 }
 
-/* fixed 7 columns + 6 date rows */
+/* compact, non-stretched layout */
 .calendarGrid {
-  flex: 1;
-  min-height: 0;
-  width: 100%;
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  grid-template-rows: 18px repeat(6, minmax(24px, 1fr));
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: 16px repeat(6, 30px);
+  row-gap: 3px;
   column-gap: 0;
-  row-gap: 2px;
-  align-items: stretch;
-  justify-items: stretch;
+  width: 100%;
+  align-content: start;
+  justify-items: center;
 }
 
 .calDayName {
@@ -331,6 +329,7 @@
   font-size: 10px;
   font-weight: 700;
   color: #6b7280;
+  width: 100%;
   padding: 0;
 }
 
@@ -338,13 +337,14 @@
   border: none;
   background: transparent;
   border-radius: 8px;
-  min-height: 0;
-  height: 100%;
+  width: 100%;
+  height: 30px;
+  min-height: 30px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding: 2px 0;
+  padding: 1px 0 0;
   cursor: pointer;
   transition: background 0.18s ease;
 }
@@ -380,8 +380,8 @@
 }
 
 .calDate__dot {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   display: inline-block;
 }
