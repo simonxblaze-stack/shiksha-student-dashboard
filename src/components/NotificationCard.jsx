@@ -18,9 +18,15 @@ const TYPE_CLASSES = {
 export default function NotificationCard({ notification, onRead }) {
   const navigate = useNavigate();
   const item = notification || {};
-  const { id, type, title, subject_name, subject_id, is_read } = item;
+  const { id, type, title, subject_name, subject_id, due_date, created_at, is_read } = item;
   const typeClass = TYPE_CLASSES[type] || "";
   const displayLabel = TYPE_LABELS[type] || type;
+
+  const formattedDate = due_date
+    ? new Date(due_date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: true })
+    : created_at
+    ? new Date(created_at).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })
+    : null;
 
   const handleClick = () => {
     if (!is_read && id && onRead) onRead(id);
@@ -46,6 +52,7 @@ export default function NotificationCard({ notification, onRead }) {
         </div>
         <p className="notifItem__title">{title}</p>
         {subject_name && <p className="notifItem__sub">{subject_name}</p>}
+        {formattedDate && <p className="notifItem__time">{formattedDate}</p>}
       </div>
     </div>
   );
