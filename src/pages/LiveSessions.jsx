@@ -160,9 +160,13 @@ export default function LiveSessions() {
     return () => { ws.close(); wsRef.current = null; };
   }, [activeCourse]);
 
-  const filtered = selectedSubject
+  const filtered = (selectedSubject
     ? sessions.filter((s) => String(s.subject_id) === String(selectedSubject))
-    : sessions;
+    : sessions
+  ).filter((s) => {
+    const st = computeStatus(s);
+    return st !== "COMPLETED" && st !== "CANCELLED";
+  });
 
   if (loading) return <div className="liveSessionsPage"><div style={{padding:20,color:"#6b7280"}}>Loading sessions...</div></div>;
   if (error)   return <div className="liveSessionsPage"><div style={{padding:20,color:"red"}}>{error}</div></div>;
